@@ -1,1 +1,959 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wheelbarrow Statics Solver | GitHub Pages Ready</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ========= TOKENS ========= */
+:root,[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--surface3:#21262d;
+  --border:rgba(255,255,255,0.08);--divider:rgba(255,255,255,0.05);
+  --text:#e6edf3;--muted:#8b949e;--faint:#484f58;
+  --primary:#58a6ff;--primary-glow:rgba(88,166,255,0.18);
+  --accent:#3fb950;--accent-glow:rgba(63,185,80,0.15);
+  --warn:#d29922;--warn-glow:rgba(210,153,34,0.15);
+  --error:#f85149;--error-glow:rgba(248,81,73,0.12);
+  --purple:#bc8cff;--orange:#ffa657;--teal:#39d353;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-xl:22px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.6);
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="light"]{
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f6f8fa;--surface3:#eaeef2;
+  --border:rgba(0,0,0,0.09);--divider:rgba(0,0,0,0.05);
+  --text:#1c2128;--muted:#57606a;--faint:#b0b8c1;
+  --primary:#0969da;--primary-glow:rgba(9,105,218,0.1);
+  --accent:#1a7f37;--accent-glow:rgba(26,127,55,0.1);
+  --warn:#9a6700;--warn-glow:rgba(154,103,0,0.08);
+  --error:#cf222e;--error-glow:rgba(207,34,46,0.08);
+  --purple:#8250df;--orange:#bc4c00;--teal:#116329;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.12);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.16);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit;transition:all var(--transition)}
+input,select{font:inherit;color:inherit;transition:all var(--transition)}
+/* ========= HEADER ========= */
+.header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+}
+.header-brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--purple));
+  border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;color:#fff;letter-spacing:-0.5px;flex-shrink:0;
+}
+.brand-text h1{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.brand-text p{font-size:11px;color:var(--muted)}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{
+  padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{filter:brightness(1.1);box-shadow:0 0 0 4px var(--primary-glow)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{background:var(--surface3);color:var(--text)}
+.theme-toggle{
+  width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);
+}
+.theme-toggle:hover{background:var(--surface3);color:var(--text)}
+/* ========= LAYOUT ========= */
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 65px)}
+.sidebar{
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;
+}
+.main-content{padding:24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
+/* ========= CARDS ========= */
+.card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px;
+}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-icon{
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.icon-blue{background:var(--primary-glow);color:var(--primary)}
+.icon-green{background:var(--accent-glow);color:var(--accent)}
+.icon-warn{background:var(--warn-glow);color:var(--warn)}
+.icon-purple{background:rgba(188,140,255,0.12);color:var(--purple)}
+.icon-orange{background:rgba(255,166,87,0.12);color:var(--orange)}
+.card-title{font-size:13px;font-weight:600;letter-spacing:0.1px}
+.card-subtitle{font-size:11px;color:var(--muted);margin-top:1px}
+/* ========= INPUTS ========= */
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field-label{
+  font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:0.6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;
+}
+.field-unit{font-size:10px;background:var(--surface3);border:1px solid var(--border);
+  padding:2px 6px;border-radius:4px;text-transform:none;letter-spacing:0;color:var(--faint)}
+.input-wrap{position:relative}
+.input-wrap input{
+  width:100%;padding:9px 12px;background:var(--surface3);border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:13px;color:var(--text);outline:none;
+}
+.input-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.input-wrap input::placeholder{color:var(--faint)}
+.input-prefix{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  font-size:12px;color:var(--muted);font-family:var(--font-mono);pointer-events:none;
+}
+.input-prefix~input{padding-left:26px}
+/* ========= SECTION DIVIDER ========= */
+.section-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  color:var(--faint);padding:4px 0;border-bottom:1px solid var(--divider);margin-bottom:12px;
+}
+/* ========= SOLVE BUTTON ========= */
+.solve-btn{
+  width:100%;padding:12px;border-radius:var(--radius-md);font-size:14px;font-weight:600;
+  background:linear-gradient(135deg,var(--primary),var(--purple));color:#fff;
+  box-shadow:var(--shadow-sm);letter-spacing:0.2px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.solve-btn:hover{filter:brightness(1.08);box-shadow:0 0 0 4px var(--primary-glow),var(--shadow-md);transform:translateY(-1px)}
+.solve-btn:active{transform:translateY(0)}
+/* ========= RESULT CHIPS ========= */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.result-chip{
+  background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:12px;text-align:center;position:relative;overflow:hidden;
+}
+.result-chip::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--chip-a),var(--chip-b));
+}
+.result-chip.blue{--chip-a:var(--primary);--chip-b:var(--purple)}
+.result-chip.green{--chip-a:var(--accent);--chip-b:#39d353}
+.result-chip.warn{--chip-a:var(--warn);--chip-b:var(--orange)}
+.result-chip.purple{--chip-a:var(--purple);--chip-b:var(--primary)}
+.chip-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.chip-value{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--text)}
+.chip-unit{font-size:11px;color:var(--muted);margin-top:2px}
+.result-chip.answer{grid-column:1/-1;background:linear-gradient(135deg,rgba(88,166,255,0.07),rgba(188,140,255,0.07));border-color:var(--primary)}
+.chip-value.answer-val{font-size:28px;color:var(--primary)}
+/* ========= FBD CANVAS ========= */
+.fbd-wrap{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:0;overflow:hidden;
+}
+.fbd-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;justify-content:space-between;
+}
+.fbd-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.fbd-tabs{display:flex;gap:4px;background:var(--surface3);padding:3px;border-radius:var(--radius-sm)}
+.fbd-tab{
+  padding:5px 12px;border-radius:4px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;
+}
+.fbd-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.canvas-container{padding:16px;display:flex;justify-content:center;align-items:center;min-height:400px}
+canvas.fbd{border-radius:var(--radius-md);display:block;max-width:100%}
+/* ========= STEPS ========= */
+.steps-list{display:flex;flex-direction:column;gap:0}
+.step{
+  display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--divider);
+  position:relative;
+}
+.step:last-child{border-bottom:none}
+.step-num{
+  width:26px;height:26px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:var(--muted);font-family:var(--font-mono);
+}
+.step.active .step-num{background:var(--primary);border-color:var(--primary);color:#fff}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.math{
+  font-family:var(--font-mono);background:var(--surface3);padding:8px 12px;
+  border-radius:var(--radius-sm);border-left:3px solid var(--primary);
+  font-size:12px;margin-top:6px;color:var(--primary);line-height:1.7;
+}
+/* ========= EQUATION BOX ========= */
+.equation-box{
+  background:linear-gradient(135deg,rgba(88,166,255,0.06),rgba(188,140,255,0.06));
+  border:1px solid rgba(88,166,255,0.2);border-radius:var(--radius-md);padding:14px 16px;
+  font-family:var(--font-mono);font-size:13px;color:var(--text);line-height:1.8;
+}
+/* ========= BADGES ========= */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full,20px);
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;
+}
+.badge-blue{background:var(--primary-glow);color:var(--primary)}
+.badge-green{background:var(--accent-glow);color:var(--accent)}
+/* ========= NOTICE ========= */
+.notice{
+  padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;color:var(--muted);
+  border:1px solid var(--divider);background:var(--surface3);display:flex;gap:8px;align-items:flex-start;
+}
+.notice.info{border-color:rgba(88,166,255,0.2);background:rgba(88,166,255,0.04)}
+/* ========= SCROLLBAR ========= */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:4px}
+/* ========= ANIMATION ========= */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeIn 0.3s ease forwards}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 var(--primary-glow)}50%{box-shadow:0 0 0 8px transparent}}
+.solving{animation:pulse-glow 1s ease infinite}
+/* ========= RESPONSIVE ========= */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
 
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo">SM</div>
+    <div class="brand-text">
+      <h1>StaticsMaster</h1>
+      <p>GitHub Pages Ready · Problem 2/40</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="badge badge-blue">⚡ Engineering Mechanics</span>
+    <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme" title="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR: INPUTS -->
+  <aside class="sidebar">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">📐</div>
+        <div>
+          <div class="card-title">Problem Configuration</div>
+          <div class="card-subtitle">Wheelbarrow · Statics · Corrected geometry</div>
+        </div>
+      </div>
+
+      <div class="section-label">Geometry</div>
+      <div class="field">
+        <div class="field-label">Handle Height (vertical) <span class="field-unit">mm</span></div>
+        <div class="input-wrap"><input type="number" id="inp_h" value="650" placeholder="e.g. 650" step="1"></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Horizontal Distance A→G <span class="field-unit">mm</span></div>
+        <div class="input-wrap"><input type="number" id="inp_d" value="925" placeholder="e.g. 925" step="1"></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Horizontal Distance G→B <span class="field-unit">mm</span></div>
+        <div class="input-wrap"><input type="number" id="inp_cg" value="200" placeholder="e.g. 200" step="1"></div>
+      </div>
+
+      <div class="section-label" style="margin-top:14px">Angles</div>
+      <div class="field">
+        <div class="field-label">Handle angle α from vertical <span class="field-unit">°</span></div>
+        <div class="input-wrap"><input type="number" id="inp_alpha" value="60" placeholder="e.g. 60" step="1"></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Frame tilt β from horizontal <span class="field-unit">°</span></div>
+        <div class="input-wrap"><input type="number" id="inp_beta" value="20" placeholder="e.g. 20" step="1"></div>
+      </div>
+
+      <div class="section-label" style="margin-top:14px">Loading</div>
+      <div class="field">
+        <div class="field-label">Total Mass (wheelbarrow + load) <span class="field-unit">kg</span></div>
+        <div class="input-wrap"><input type="number" id="inp_mass" value="85" placeholder="e.g. 85" step="0.1"></div>
+      </div>
+      <div class="field">
+        <div class="field-label">Gravity g <span class="field-unit">m/s²</span></div>
+        <div class="input-wrap"><input type="number" id="inp_g" value="9.81" placeholder="9.81" step="0.01"></div>
+      </div>
+
+      <button class="solve-btn" id="solveBtn" onclick="solve()" style="margin-top:18px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Solve & Visualize
+      </button>
+    </div>
+
+    <!-- OUTPUT CHIPS -->
+    <div id="resultCard" class="card" style="display:none">
+      <div class="card-header">
+        <div class="card-icon icon-green">✅</div>
+        <div>
+          <div class="card-title">Results</div>
+          <div class="card-subtitle">Equilibrium Analysis</div>
+        </div>
+      </div>
+      <div class="result-grid">
+        <div class="result-chip blue">
+          <div class="chip-label">Weight</div>
+          <div class="chip-value" id="res_W">—</div>
+          <div class="chip-unit">N</div>
+        </div>
+        <div class="result-chip purple">
+          <div class="chip-label">Arm (handle)</div>
+          <div class="chip-value" id="res_dF">—</div>
+          <div class="chip-unit">m</div>
+        </div>
+        <div class="result-chip warn">
+          <div class="chip-label">Arm (weight)</div>
+          <div class="chip-value" id="res_dW">—</div>
+          <div class="chip-unit">m</div>
+        </div>
+        <div class="result-chip green">
+          <div class="chip-label">M_weight (B)</div>
+          <div class="chip-value" id="res_Mw">—</div>
+          <div class="chip-unit">N·m</div>
+        </div>
+        <div class="result-chip answer">
+          <div class="chip-label">Required Force F at A</div>
+          <div class="chip-value answer-val" id="res_F">—</div>
+          <div class="chip-unit">N  <span id="res_F_kgf" style="color:var(--muted);font-size:11px"></span></div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN: FBD + STEPS -->
+  <main class="main-content">
+
+    <!-- FBD SECTION -->
+    <div class="fbd-wrap">
+      <div class="fbd-header">
+        <div class="fbd-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M12 8v8"/></svg>
+          Free Body Diagram
+        </div>
+        <div class="fbd-tabs">
+          <div class="fbd-tab active" id="tab-fbd" onclick="switchTab('fbd')">Full FBD</div>
+          <div class="fbd-tab" id="tab-geom" onclick="switchTab('geom')">Geometry</div>
+          <div class="fbd-tab" id="tab-moment" onclick="switchTab('moment')">Moments</div>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <canvas class="fbd" id="fbdCanvas" width="680" height="400"></canvas>
+      </div>
+    </div>
+
+    <!-- STEP BY STEP SOLUTION -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-warn">📝</div>
+        <div>
+          <div class="card-title">Step-by-Step Solution</div>
+          <div class="card-subtitle">Moment equilibrium about point B</div>
+        </div>
+      </div>
+      <div id="stepsContainer">
+        <div class="notice info">
+          <span>ℹ️</span>
+          <span>Enter your values in the sidebar and click <strong>Solve &amp; Visualize</strong> to see the complete worked solution.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EQUATION OVERVIEW -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">∑</div>
+        <div>
+          <div class="card-title">Governing Equation</div>
+          <div class="card-subtitle">Static Equilibrium — Net Moment = 0</div>
+        </div>
+      </div>
+      <div class="equation-box" id="eqBox">
+        ΣM_B = 0<br>
+        F · d_F  −  W · d_W  =  0<br><br>
+        where:<br>
+        · F  = applied force at A, inclined by α from the handle direction<br>
+        · d_F = perpendicular distance from B to line of action of F<br>
+        · W  = mg  (weight acting at G)<br>
+        · d_W = perpendicular distance from B to weight's line of action
+      </div>
+    </div>
+
+  
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-orange">🚀</div>
+        <div>
+          <div class="card-title">GitHub Pages Deployment</div>
+          <div class="card-subtitle">Ready to upload as index.html</div>
+        </div>
+      </div>
+      <div class="notice info">
+        <span>1️⃣</span>
+        <span>Create a GitHub repository, rename this file to <strong>index.html</strong>, upload it, then enable <strong>Settings → Pages → Deploy from branch</strong>. This version uses the corrected geometry <strong>A→B = A→G + G→B</strong>.</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// =========================================================
+// THEME TOGGLE
+// =========================================================
+(function(){
+  const btn=document.querySelector('[data-theme-toggle]');
+  const root=document.documentElement;
+  let d=root.getAttribute('data-theme')||'dark';
+  function updateIcon(){
+    btn.innerHTML=d==='dark'
+      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  btn.addEventListener('click',()=>{
+    d=d==='dark'?'light':'dark';
+    root.setAttribute('data-theme',d);
+    updateIcon();
+    if(window._lastParams) drawFBD(window._lastParams,window._activeTab||'fbd');
+  });
+  updateIcon();
+})();
+
+// =========================================================
+// TAB SWITCH
+// =========================================================
+window._activeTab='fbd';
+function switchTab(tab){
+  window._activeTab=tab;
+  ['fbd','geom','moment'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  if(window._lastParams) drawFBD(window._lastParams,tab);
+  else drawDefaultFBD(tab);
+}
+
+// =========================================================
+// HELPERS
+// =========================================================
+function deg2rad(d){return d*Math.PI/180}
+function fmtN(v){return v.toFixed(1)}
+function fmtM(v){return v.toFixed(3)}
+
+// =========================================================
+// SOLVE
+// =========================================================
+function solve(){
+  const H  =parseFloat(document.getElementById('inp_h').value);
+  const D  =parseFloat(document.getElementById('inp_d').value);
+  const CG =parseFloat(document.getElementById('inp_cg').value);
+  const alpha=parseFloat(document.getElementById('inp_alpha').value);
+  const beta =parseFloat(document.getElementById('inp_beta').value);
+  const mass=parseFloat(document.getElementById('inp_mass').value);
+  const g   =parseFloat(document.getElementById('inp_g').value);
+
+  if([H,D,CG,alpha,beta,mass,g].some(isNaN)||H<=0||D<=0||mass<=0){
+    alert('Please fill all fields with valid positive numbers.'); return;
+  }
+
+  // Convert
+  const H_m=H/1000, AG_m=D/1000, GB_m=CG/1000;
+  const AB_m=AG_m+GB_m;
+  const alpha_r=deg2rad(alpha), beta_r=deg2rad(beta);
+  const W=mass*g;
+
+  // Coordinates with B as origin:
+  // G = (-GB_m, y_G), A = (-AB_m, H_m)
+  // The handle/bar makes beta with the horizontal, sloping downward to the right.
+  // The applied force F makes alpha with the handle, so its absolute direction is:
+  // theta_F = (180° - beta) - alpha
+  const thetaF = Math.PI - beta_r - alpha_r;
+  const Fx_unit = Math.cos(thetaF);
+  const Fy_unit = Math.sin(thetaF);
+
+  // Moment arm coefficient of F about B from r x F = (x_A*Fy - y_A*Fx)F
+  const M_F_coeff = (-AB_m)*Fy_unit - (H_m)*Fx_unit;
+  const dF_actual = Math.abs(M_F_coeff);
+
+  // Weight acts vertically downward through G; its lever arm about B is G→B.
+  const dW = GB_m;
+  const M_W = W * dW;
+
+  // Equilibrium about B: F*dF = W*dW
+  const F = M_W / dF_actual;
+
+  // Store params
+  const params={H,D,CG,alpha,beta,mass,g,H_m,AG_m,GB_m,AB_m,alpha_r,beta_r,W,dF:dF_actual,dW,M_W,F};
+  window._lastParams=params;
+
+  // Update chips
+  document.getElementById('res_W').textContent=fmtN(W);
+  document.getElementById('res_dF').textContent=dF_actual.toFixed(4);
+  document.getElementById('res_dW').textContent=fmtM(dW);
+  document.getElementById('res_Mw').textContent=fmtN(M_W);
+  document.getElementById('res_F').textContent=fmtN(F);
+  document.getElementById('res_F_kgf').textContent='(≈ '+(F/9.81).toFixed(2)+' kgf)';
+
+  // Show result card
+  const rc=document.getElementById('resultCard');
+  rc.style.display='';
+  rc.classList.add('animate-in');
+
+  // Steps
+  renderSteps(params);
+
+  // Draw FBD
+  drawFBD(params, window._activeTab||'fbd');
+
+  // Update equation box
+  document.getElementById('eqBox').innerHTML=
+    `ΣM<sub>B</sub> = 0<br><br>`+
+    `A→B = A→G + G→B = ${fmtM(AG_m)} + ${fmtM(GB_m)} = ${fmtM(AB_m)} m<br>`+
+    `θ<sub>F</sub> = 180° − β − α = ${(180 - beta - alpha).toFixed(1)}°<br>`+
+    `F × d<sub>F</sub>  =  W × d<sub>W</sub><br><br>`+
+    `F × ${fmtM(dF_actual)} m  =  ${fmtN(W)} N × ${fmtM(dW)} m<br><br>`+
+    `<strong>F  =  ${fmtN(M_W)} / ${fmtM(dF_actual)}  =  <span style="color:var(--primary)">${fmtN(F)} N</span></strong>`;
+}
+
+// =========================================================
+// RENDER STEPS
+// =========================================================
+function renderSteps(p){
+  const {H_m,AG_m,GB_m,AB_m,alpha,beta,alpha_r,W,dF,dW,M_W,F,mass,g}=p;
+  const steps=[
+    {
+      t:'Define Coordinate System & Free Body',
+      d:'Take point B (tire contact point) as the moment reference. Apply ΣM_B = 0. Only external forces — the applied force F at A and the weight W at G — create moments about B. The reaction at B creates zero moment.',
+      math:null
+    },
+    {
+      t:'Calculate Weight',
+      d:`The combined weight of the wheelbarrow and its dirt load acts downward at the center of mass G.`,
+      math:`W = m × g = ${mass} kg × ${g} m/s²\n    W = ${W.toFixed(2)} N`
+    },
+    {
+      t:'Locate the Weight Arm (d_W)',
+      d:`G is located ${p.CG} mm = ${GB_m.toFixed(3)} m horizontally from B. The weight vector is vertical (downward), so its moment arm about B equals the horizontal distance from B to G.`,
+      math:`d_W = ${p.CG} mm = ${GB_m.toFixed(4)} m`
+    },
+    {
+      t:'Calculate Moment of Weight about B',
+      d:`The weight creates a clockwise moment about B (tends to tip the wheelbarrow forward/down toward the wheel).`,
+      math:`M_W = W × d_W\n     = ${W.toFixed(2)} × ${CG_m.toFixed(4)}\n     = ${M_W.toFixed(3)} N·m  (clockwise)`
+    },
+    {
+      t:'Find Force Arm (d_F) of Applied Force',
+      d:`First compute A→B from the base dimensions: A→B = A→G + G→B = ${p.D} + ${p.CG} = ${(p.D + p.CG)} mm = ${AB_m.toFixed(3)} m. The handle is inclined by β=${beta}° below the horizontal, and F makes α=${alpha}° with the handle. Hence the absolute force direction is θ_F = 180° − β − α = ${(180 - p.beta - p.alpha).toFixed(1)}°. Using r_BA × F̂ with r_BA = (−${AB_m.toFixed(3)}, ${H_m.toFixed(3)}) m`,
+      math:`θ_F = 180° − β − α = ${(180 - p.beta - p.alpha).toFixed(1)}°\n d_F = |x_A sinθ_F − y_A cosθ_F|\n     = |(−${D_m.toFixed(3)})sin(${(180 - p.beta - p.alpha).toFixed(1)}°) − (${H_m.toFixed(3)})cos(${(180 - p.beta - p.alpha).toFixed(1)}°)|\n     = ${dF.toFixed(4)} m`
+    },
+    {
+      t:'Apply Moment Equilibrium  ΣM_B = 0',
+      d:'For equilibrium, the counter-clockwise moment produced by F must exactly balance the clockwise moment from W.',
+      math:`ΣM_B = 0\nF × d_F  −  W × d_W = 0\nF × ${dF.toFixed(4)} = ${M_W.toFixed(3)}`
+    },
+    {
+      t:'Solve for Required Force F',
+      d:`Solving for the unknown applied force F:`,
+      math:`F = M_W / d_F\n  = ${M_W.toFixed(3)} / ${dF.toFixed(4)}\n  = ${F.toFixed(2)} N  ≈ ${(F/9.81).toFixed(2)} kgf  ✓`
+    }
+  ];
+
+  const html=steps.map((s,i)=>`
+    <div class="step ${i===steps.length-1?'active':''}">
+      <div class="step-num">${i+1}</div>
+      <div class="step-content">
+        <div class="step-title">${s.t}</div>
+        <div class="step-desc">${s.d.replace(/\n/g,'<br>')}</div>
+        ${s.math?`<div class="math">${s.math.replace(/\n/g,'<br>')}</div>`:''}
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('stepsContainer').innerHTML=`<div class="steps-list">${html}</div>`;
+}
+
+// =========================================================
+// FBD DRAWING
+// =========================================================
+function getCSSVar(v){
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+}
+
+function drawFBD(p, tab){
+  const canvas=document.getElementById('fbdCanvas');
+  const ctx=canvas.getContext('2d');
+  const W2=canvas.width, H2=canvas.height;
+  ctx.clearRect(0,0,W2,H2);
+
+  if(tab==='fbd') drawFullFBD(ctx,p,W2,H2);
+  else if(tab==='geom') drawGeom(ctx,p,W2,H2);
+  else drawMomentDiag(ctx,p,W2,H2);
+}
+
+function cssProp(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+function drawFullFBD(ctx,p,cw,ch){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const bgColor=isDark?'#161b22':'#ffffff';
+  const textColor=isDark?'#e6edf3':'#1c2128';
+  const gridColor=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)';
+  const dimColor=isDark?'#484f58':'#b0b8c1';
+  const blue='#58a6ff', green='#3fb950', warn='#d29922', purple='#bc8cff', red='#f85149';
+
+  // Background
+  ctx.fillStyle=bgColor; ctx.fillRect(0,0,cw,ch);
+
+  // Grid
+  ctx.strokeStyle=gridColor; ctx.lineWidth=1;
+  for(let x=0;x<cw;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,ch);ctx.stroke()}
+  for(let y=0;y<ch;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cw,y);ctx.stroke()}
+
+  // Scale: map problem geometry to canvas
+  // B is at ground, canvas coords: B=(500,340), A=(500-D*scale, 340-H*scale) roughly
+  const scale=0.28; // px per mm
+  const Bx=490, By=340;
+  const Ax=Bx-p.AB_m*1000*scale, Ay=By-p.H*scale;
+
+  // Ground line
+  ctx.strokeStyle=dimColor; ctx.lineWidth=2;
+  ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(40,By+2); ctx.lineTo(cw-20,By+2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ground hatch
+  ctx.strokeStyle=dimColor; ctx.lineWidth=1;
+  for(let x=40;x<cw-20;x+=14){
+    ctx.beginPath(); ctx.moveTo(x,By+2); ctx.lineTo(x-10,By+14); ctx.stroke();
+  }
+
+  // Wheelbarrow body (stylized trapezoid)
+  const Gx=Bx-p.GB_m*1000*scale, Gy=By-80;
+  // Frame line A to G/B area
+  ctx.strokeStyle=isDark?'#30363d':'#d0d7de'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx-8,By-8); ctx.stroke();
+
+  // Tray (box)
+  const trayW=160, trayH=55;
+  const trayX=Gx-trayW*0.4, trayY=Gy-trayH;
+  ctx.fillStyle=isDark?'rgba(33,38,45,0.9)':'rgba(230,235,240,0.9)';
+  ctx.strokeStyle=isDark?'#444c56':'#adb5bd';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(trayX,trayY+trayH); ctx.lineTo(trayX+trayW,trayY+trayH);
+  ctx.lineTo(trayX+trayW-15,trayY); ctx.lineTo(trayX+15,trayY); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Dirt fill
+  ctx.fillStyle=isDark?'rgba(210,153,34,0.25)':'rgba(193,132,31,0.2)';
+  ctx.beginPath();
+  ctx.moveTo(trayX+5,trayY+trayH-5); ctx.lineTo(trayX+trayW-5,trayY+trayH-5);
+  ctx.lineTo(trayX+trayW-20,trayY+5); ctx.lineTo(trayX+20,trayY+5); ctx.closePath();
+  ctx.fill();
+
+  // Wheel at B
+  ctx.beginPath(); ctx.arc(Bx,By,22,0,Math.PI*2);
+  ctx.fillStyle=isDark?'rgba(88,166,255,0.1)':'rgba(9,105,218,0.08)';
+  ctx.fill();
+  ctx.strokeStyle=blue; ctx.lineWidth=2.5; ctx.stroke();
+  // Wheel spokes
+  ctx.strokeStyle=blue; ctx.lineWidth=1;
+  for(let a=0;a<Math.PI*2;a+=Math.PI/4){
+    ctx.beginPath(); ctx.moveTo(Bx,By); ctx.lineTo(Bx+20*Math.cos(a),By+20*Math.sin(a)); ctx.stroke();
+  }
+
+  // Point B dot
+  ctx.beginPath(); ctx.arc(Bx,By,5,0,Math.PI*2);
+  ctx.fillStyle=red; ctx.fill();
+  ctx.font='bold 12px Inter,sans-serif'; ctx.fillStyle=red; ctx.textAlign='left';
+  ctx.fillText('B (pivot)',Bx+8,By+5);
+
+  // Point A dot
+  ctx.beginPath(); ctx.arc(Ax,Ay,5,0,Math.PI*2);
+  ctx.fillStyle=green; ctx.fill();
+  ctx.font='bold 12px Inter,sans-serif'; ctx.fillStyle=green;
+  ctx.fillText('A',Ax-18,Ay+4);
+
+  // Point G dot
+  ctx.beginPath(); ctx.arc(Gx,Gy,5,0,Math.PI*2);
+  ctx.fillStyle=warn; ctx.fill();
+  ctx.font='bold 12px Inter,sans-serif'; ctx.fillStyle=warn;
+  ctx.fillText('G',Gx+8,Gy-8);
+
+  // ---- FORCE ARROWS ----
+  function arrow(ctx,x1,y1,x2,y2,color,label,labelSide='right'){
+    const dx=x2-x1, dy=y2-y1;
+    const len=Math.sqrt(dx*dx+dy*dy);
+    const ux=dx/len, uy=dy/len;
+    ctx.strokeStyle=color; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    // Arrowhead
+    const hLen=10, hW=5;
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-hLen*ux+hW*uy, y2-hLen*uy-hW*ux);
+    ctx.lineTo(x2-hLen*ux-hW*uy, y2-hLen*uy+hW*ux);
+    ctx.closePath(); ctx.fill();
+    // Label
+    ctx.font='bold 13px Inter,sans-serif'; ctx.fillStyle=color;
+    if(labelSide==='right'){ ctx.textAlign='left'; ctx.fillText(label,x2+8,y2+4); }
+    else if(labelSide==='left'){ ctx.textAlign='right'; ctx.fillText(label,x2-8,y2+4); }
+    else if(labelSide==='top'){ ctx.textAlign='center'; ctx.fillText(label,x2,(y2+y1)/2-8); }
+  }
+
+  // F at A
+  const thetaF=Math.PI - p.beta_r - p.alpha_r;
+  const Flen=80;
+  const Fx2=Ax+Flen*Math.cos(thetaF), Fy2=Ay-Flen*Math.sin(thetaF);
+  arrow(ctx,Ax,Ay,Fx2,Fy2,green,'F','right');
+
+  // Weight W at G (downward)
+  arrow(ctx,Gx,Gy,Gx,Gy+75,warn,'W = mg','right');
+
+  // Reaction at B (upward)
+  arrow(ctx,Bx,By,Bx,By-60,purple,'R_B','right');
+
+  // ---- DIMENSION LINES ----
+  function dimLine(ctx,x1,y,x2,label,color='#484f58',offset=25){
+    ctx.strokeStyle=color; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x1,y-offset); ctx.lineTo(x1,y+8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2,y-offset); ctx.lineTo(x2,y+8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1,y-offset+10); ctx.lineTo(x2,y-offset+10); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='11px JetBrains Mono,monospace'; ctx.fillStyle=color; ctx.textAlign='center';
+    ctx.fillText(label,(x1+x2)/2,y-offset+24);
+  }
+  const dimY=By+30;
+  dimLine(ctx,Ax,dimY,Bx,`A→B = ${Math.round(p.AB_m*1000)} mm`,dimColor);
+  dimLine(ctx,Ax,By+50,Gx,`A→G = ${p.D} mm`,dimColor,25);
+  dimLine(ctx,Gx,By+78,Bx,`G→B = ${p.CG} mm`,dimColor,25);
+
+  // Vertical dimension H
+  ctx.strokeStyle=dimColor; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(Ax-30,Ay); ctx.lineTo(Ax-30,By); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(Ax-30,Ay); ctx.lineTo(Ax-24,Ay+8); ctx.lineTo(Ax-36,Ay+8); ctx.closePath(); ctx.fillStyle=dimColor; ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(Ax-30,By); ctx.lineTo(Ax-24,By-8); ctx.lineTo(Ax-36,By-8); ctx.closePath(); ctx.fill();
+  ctx.font='11px JetBrains Mono,monospace'; ctx.fillStyle=dimColor; ctx.textAlign='center';
+  ctx.save(); ctx.translate(Ax-44,(Ay+By)/2); ctx.rotate(-Math.PI/2); ctx.fillText(`H = ${p.H} mm`,0,0); ctx.restore();
+
+  // Angle labels at A: handle and applied force relation
+  const handleTheta = Math.PI - p.beta_r;
+  ctx.strokeStyle=green; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(Ax,Ay,28, -handleTheta, -thetaF, true); ctx.stroke();
+  ctx.font='12px Inter,sans-serif'; ctx.fillStyle=green; ctx.textAlign='left';
+  ctx.fillText(`α=${p.alpha}°`,Ax+16,Ay-28);
+
+  // Title
+  ctx.font='bold 14px Inter,sans-serif'; ctx.fillStyle=textColor; ctx.textAlign='left';
+  ctx.fillText('Free Body Diagram — Wheelbarrow',16,22);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dimColor;
+  ctx.fillText('ΣM_B = 0  (Moment equilibrium about tire contact point B)',16,38);
+
+  // Legend
+  const legendItems=[
+    [green,'F — Applied force at handle A'],
+    [warn,'W — Weight (mg) at center of mass G'],
+    [purple,'R_B — Ground reaction at B'],
+    [red,'B — Moment reference point (pivot)'],
+  ];
+  let lx=16, ly=ch-20;
+  legendItems.forEach(([c,t])=>{
+    ctx.beginPath(); ctx.arc(lx+5,ly-4,4,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+    ctx.font='10px Inter,sans-serif'; ctx.fillStyle=dimColor; ctx.textAlign='left';
+    ctx.fillText(t,lx+14,ly);
+    lx+=170;
+  });
+}
+
+function drawGeom(ctx,p,cw,ch){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const bg=isDark?'#161b22':'#fff';
+  const textColor=isDark?'#e6edf3':'#1c2128';
+  const dim=isDark?'#484f58':'#adb5bd';
+  const blue='#58a6ff', green='#3fb950', warn='#d29922';
+  ctx.fillStyle=bg; ctx.fillRect(0,0,cw,ch);
+
+  const scale=0.28;
+  const Bx=490, By=310;
+  const Ax=Bx-p.AB_m*1000*scale, Ay=By-p.H*scale;
+  const Gx=Bx-p.CG*scale, Gy=By;
+
+  // Baseline
+  ctx.strokeStyle=dim; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(30,By); ctx.lineTo(cw-30,By); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Vertical from A
+  ctx.strokeStyle=dim; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Ax,By); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Frame line
+  ctx.strokeStyle=isDark?'#30363d':'#ced4da'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.stroke();
+
+  // Points
+  function dot(x,y,c,label,ox=8,oy=0){
+    ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+    ctx.font='bold 13px Inter,sans-serif'; ctx.fillStyle=c; ctx.textAlign='left';
+    ctx.fillText(label,x+ox,y+oy);
+  }
+  dot(Bx,By,'#f85149','B',8,4);
+  dot(Ax,Ay,green,'A',-20,0);
+  dot(Gx,Gy,warn,'G',8,-10);
+
+  // Force at A
+  const thetaF=Math.PI - p.beta_r - p.alpha_r;
+  const Flen=90;
+  const Fx2=Ax+Flen*Math.cos(thetaF), Fy2=Ay-Flen*Math.sin(thetaF);
+  ctx.strokeStyle=green; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Fx2,Fy2); ctx.stroke();
+  ctx.fillStyle=green; ctx.beginPath();
+  ctx.moveTo(Fx2,Fy2);
+  const ux=(Fx2-Ax)/Flen, uy=(Fy2-Ay)/Flen;
+  ctx.lineTo(Fx2-12*ux+5*uy,Fy2-12*uy-5*ux); ctx.lineTo(Fx2-12*ux-5*uy,Fy2-12*uy+5*ux); ctx.closePath(); ctx.fill();
+  ctx.font='13px Inter,sans-serif'; ctx.fillStyle=green; ctx.textAlign='left'; ctx.fillText('F',Fx2+6,Fy2);
+
+  // Alpha angle between handle and force
+  const handleTheta=Math.PI - p.beta_r;
+  ctx.strokeStyle=green; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(Ax,Ay,32,-handleTheta,-thetaF,true); ctx.stroke();
+  ctx.font='12px Inter,sans-serif'; ctx.fillStyle=green; ctx.textAlign='left';
+  ctx.fillText(`α = ${p.alpha}°`,Ax+18,Ay-30);
+
+  // Handle reference ray
+  ctx.strokeStyle=dim; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Ax+70*Math.cos(handleTheta),Ay-70*Math.sin(handleTheta)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dim; ctx.fillText(`β = ${p.beta}°`,Ax+50,Ay+18);
+
+  // Perpendicular distance dF dashed
+  // Foot of perpendicular from B to line of F
+  const Fdx=Math.cos(thetaF), Fdy=-Math.sin(thetaF);
+  const t_param=(-(Ax-Bx)*Fdx-(Ay-By)*Fdy);
+  const footX=Ax+t_param*Fdx, footY=Ay+t_param*Fdy;
+  ctx.strokeStyle=blue; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+  ctx.beginPath(); ctx.moveTo(Bx,By); ctx.lineTo(footX,footY); ctx.stroke();
+  ctx.setLineDash([]);
+  // right angle mark at foot
+  const perpLen=8;
+  ctx.strokeStyle=blue; ctx.lineWidth=1;
+  const nx=Fdx, ny=Fdy; // direction along F
+  const px=-ny, py=nx; // perpendicular direction (from B)
+  ctx.beginPath();
+  ctx.moveTo(footX+perpLen*px,footY+perpLen*py);
+  ctx.lineTo(footX+perpLen*px+perpLen*nx,footY+perpLen*py+perpLen*ny);
+  ctx.lineTo(footX+perpLen*nx,footY+perpLen*ny);
+  ctx.stroke();
+  ctx.font='bold 11px JetBrains Mono,monospace'; ctx.fillStyle=blue; ctx.textAlign='center';
+  ctx.fillText(`d_F = ${p.dF.toFixed(4)} m`,(Bx+footX)/2+20,(By+footY)/2-8);
+
+  // Weight arm dW
+  ctx.strokeStyle=warn; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+  ctx.beginPath(); ctx.moveTo(Bx,By); ctx.lineTo(Gx,By); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font='bold 11px JetBrains Mono,monospace'; ctx.fillStyle=warn; ctx.textAlign='center';
+  ctx.fillText(`d_W = ${p.dW.toFixed(3)} m`,(Bx+Gx)/2,By-10);
+
+  ctx.font='bold 14px Inter,sans-serif'; ctx.fillStyle=textColor; ctx.textAlign='left';
+  ctx.fillText('Geometry — Moment Arms',16,22);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dim;
+  ctx.fillText('Perpendicular distances from B to each force line of action',16,38);
+}
+
+function drawMomentDiag(ctx,p,cw,ch){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const bg=isDark?'#161b22':'#fff';
+  const textColor=isDark?'#e6edf3':'#1c2128';
+  const dim=isDark?'#8b949e':'#6e7781';
+  ctx.fillStyle=bg; ctx.fillRect(0,0,cw,ch);
+
+  const MW=p.M_W;
+  const MF=p.F*p.dF;
+  const maxM=Math.max(MW,MF)*1.25;
+  const barH=60, barGap=60, startY=90;
+  const barMaxW=cw-200;
+
+  // Title
+  ctx.font='bold 14px Inter,sans-serif'; ctx.fillStyle=textColor; ctx.textAlign='left';
+  ctx.fillText('Moment Diagram — About Point B',16,22);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dim;
+  ctx.fillText('Clockwise (+) vs Counter-Clockwise (−)',16,38);
+
+  // Weight moment bar (clockwise)
+  const wW=barMaxW*(MW/maxM);
+  ctx.fillStyle='rgba(210,153,34,0.18)';
+  ctx.beginPath(); ctx.roundRect(80,startY,wW,barH,6); ctx.fill();
+  ctx.strokeStyle='#d29922'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.roundRect(80,startY,wW,barH,6); ctx.stroke();
+  ctx.font='bold 13px Inter,sans-serif'; ctx.fillStyle='#d29922'; ctx.textAlign='left';
+  ctx.fillText(`M_W = ${MW.toFixed(2)} N·m  ↻ (CW)`,88,startY+barH/2+5);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dim;
+  ctx.fillText('Weight moment',16,startY+barH/2+5);
+
+  // F moment bar (counter-clockwise)
+  const y2=startY+barH+barGap;
+  const fW=barMaxW*(MF/maxM);
+  ctx.fillStyle='rgba(88,166,255,0.18)';
+  ctx.beginPath(); ctx.roundRect(80,y2,fW,barH,6); ctx.fill();
+  ctx.strokeStyle='#58a6ff'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.roundRect(80,y2,fW,barH,6); ctx.stroke();
+  ctx.font='bold 13px Inter,sans-serif'; ctx.fillStyle='#58a6ff'; ctx.textAlign='left';
+  ctx.fillText(`M_F = F × d_F = ${MF.toFixed(2)} N·m  ↺ (CCW)`,88,y2+barH/2+5);
+  ctx.font='11px Inter,sans-serif'; ctx.fillStyle=dim;
+  ctx.fillText('Force moment',16,y2+barH/2+5);
+
+  // Net moment
+  const net=MF-MW;
+  const y3=y2+barH+barGap;
+  ctx.strokeStyle=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'; ctx.lineWidth=1; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(80,y3-10); ctx.lineTo(cw-20,y3-10); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font='bold 15px JetBrains Mono,monospace'; ctx.fillStyle=Math.abs(net)<0.5?'#3fb950':'#f85149'; ctx.textAlign='left';
+  ctx.fillText(`Net ΣM_B = ${net.toFixed(3)} N·m`,80,y3+20);
+  ctx.font='13px Inter,sans-serif'; ctx.fillStyle=Math.abs(net)<0.5?'#3fb950':dim;
+  ctx.fillText(Math.abs(net)<0.5?'✓ Equilibrium satisfied':'≠ 0 (adjust F)',80,y3+40);
+
+  // Force display
+  ctx.font='bold 18px JetBrains Mono,monospace'; ctx.fillStyle='#58a6ff'; ctx.textAlign='right';
+  ctx.fillText(`F = ${p.F.toFixed(2)} N`,cw-20,y3+24);
+}
+
+function drawDefaultFBD(tab){
+  const canvas=document.getElementById('fbdCanvas');
+  const ctx=canvas.getContext('2d');
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle=isDark?'#161b22':'#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.font='14px Inter,sans-serif';
+  ctx.fillStyle=isDark?'#484f58':'#b0b8c1';
+  ctx.textAlign='center';
+  ctx.fillText('Enter values and click Solve & Visualize',canvas.width/2,canvas.height/2-10);
+  ctx.font='12px Inter,sans-serif';
+  ctx.fillText('The free body diagram will appear here',canvas.width/2,canvas.height/2+14);
+}
+
+// Initial draw
+drawDefaultFBD('fbd');
+</script>
+</body>
+</html>
