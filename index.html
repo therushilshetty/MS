@@ -1,496 +1,377 @@
+Yes bhai — here is the full code exactly from the generated app file. It is a complete single-file HTML app with GUI, custom symbol inputs, and smooth animated FBD tab transitions.
+
+xml
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wheelbarrow Statics Solver | GitHub Pages Ready</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StaticsMaster - Wheelbarrow Moment Solver</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* ========= TOKENS ========= */
 :root,[data-theme="dark"]{
-  --bg:#0b1020;--surface:#11182b;--surface2:#162038;--surface3:#1b2744;
-  --border:rgba(170,198,255,0.12);--divider:rgba(170,198,255,0.07);
-  --text:#eef4ff;--muted:#9aa8c7;--faint:#55627f;
-  --primary:#63c6ff;--primary-glow:rgba(99,198,255,0.18);
-  --accent:#4de2b1;--accent-glow:rgba(77,226,177,0.16);
-  --warn:#ffc857;--warn-glow:rgba(255,200,87,0.16);
-  --error:#ff6b7a;--error-glow:rgba(255,107,122,0.14);
-  --purple:#9f8cff;--orange:#ff9f5a;--teal:#35d4c4;
-  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-xl:22px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.5);
-  --shadow-lg:0 12px 40px rgba(0,0,0,0.6);
-  --font-body:'Inter',system-ui,sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
-  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+  --bg:#0a1020;--surface:#121a2d;--surface2:#17223b;--surface3:#1c2946;
+  --border:rgba(175,205,255,.12);--divider:rgba(175,205,255,.08);
+  --text:#edf4ff;--muted:#98a7c7;--faint:#5f6d89;
+  --primary:#63c7ff;--primary-glow:rgba(99,199,255,.18);
+  --accent:#42e3ba;--accent-glow:rgba(66,227,186,.18);
+  --warn:#ffc85c;--warn-glow:rgba(255,200,92,.15);
+  --danger:#ff7284;--danger-glow:rgba(255,114,132,.14);
+  --purple:#9987ff;--teal:#36d3c7;
+  --shadow-sm:0 8px 24px rgba(0,0,0,.18);--shadow-md:0 20px 50px rgba(0,0,0,.24);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-xl:24px;
+  --font-body:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
 }
 [data-theme="light"]{
-  --bg:#eef4fb;--surface:#ffffff;--surface2:#f7faff;--surface3:#edf3ff;
-  --border:rgba(31,57,102,0.10);--divider:rgba(31,57,102,0.06);
-  --text:#17233b;--muted:#5d6d8b;--faint:#a8b4c8;
-  --primary:#0f8bff;--primary-glow:rgba(15,139,255,0.12);
-  --accent:#0ea77a;--accent-glow:rgba(14,167,122,0.12);
-  --warn:#c98a00;--warn-glow:rgba(201,138,0,0.10);
-  --error:#d9485f;--error-glow:rgba(217,72,95,0.10);
-  --purple:#6f67ff;--orange:#e87c2f;--teal:#1296a6;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.12);
-  --shadow-lg:0 12px 40px rgba(0,0,0,0.16);
+  --bg:#eef4fb;--surface:#fff;--surface2:#f8fbff;--surface3:#edf4ff;
+  --border:rgba(25,50,92,.10);--divider:rgba(25,50,92,.06);
+  --text:#17233b;--muted:#617393;--faint:#9ca8bc;
+  --primary:#0f8cff;--primary-glow:rgba(15,140,255,.12);
+  --accent:#0ca881;--accent-glow:rgba(12,168,129,.12);
+  --warn:#c98b00;--warn-glow:rgba(201,139,0,.10);
+  --danger:#d94862;--danger-glow:rgba(217,72,98,.10);
+  --purple:#7068ff;--teal:#1198a9;
+  --shadow-sm:0 8px 24px rgba(18,28,45,.08);--shadow-md:0 20px 50px rgba(18,28,45,.12);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
-button{cursor:pointer;border:none;background:none;font:inherit;color:inherit;transition:all var(--transition)}
-input,select{font:inherit;color:inherit;transition:all var(--transition)}
-.header{
-  background:linear-gradient(180deg,color-mix(in srgb, var(--surface) 92%, var(--primary) 8%),var(--surface));border-bottom:1px solid var(--border);
-  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
-}
-.header-brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--purple));
-  border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:14px;color:#fff;letter-spacing:-0.5px;flex-shrink:0;
-}
-.brand-text h1{font-size:15px;font-weight:600;letter-spacing:-0.3px}
-.brand-text p{font-size:11px;color:var(--muted)}
-.header-actions{display:flex;gap:8px;align-items:center}
-.btn{
-  padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;
-  display:inline-flex;align-items:center;gap:6px;
-}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{filter:brightness(1.1);box-shadow:0 0 0 4px var(--primary-glow)}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.btn-ghost:hover{background:var(--surface3);color:var(--text)}
-.theme-toggle{
-  width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;color:var(--muted);
-}
-.theme-toggle:hover{background:var(--surface3);color:var(--text)}
-.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 65px)}
-.sidebar{
-  background:var(--surface);border-right:1px solid var(--border);
-  padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;
-}
-.main-content{padding:24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
-.card{
-  background:linear-gradient(180deg,color-mix(in srgb, var(--surface2) 94%, white 6%),var(--surface2));border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm);
-}
-.card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.card-icon{
-  width:32px;height:32px;border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
-}
-.icon-blue{background:var(--primary-glow);color:var(--primary)}
-.icon-green{background:var(--accent-glow);color:var(--accent)}
-.icon-warn{background:var(--warn-glow);color:var(--warn)}
-.icon-purple{background:rgba(188,140,255,0.12);color:var(--purple)}
-.icon-orange{background:rgba(255,166,87,0.12);color:var(--orange)}
-.card-title{font-size:13px;font-weight:600;letter-spacing:0.1px}
-.card-subtitle{font-size:11px;color:var(--muted);margin-top:1px}
-.field{margin-bottom:12px}
-.field:last-child{margin-bottom:0}
-.field-label{
-  font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
-  letter-spacing:0.6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;
-}
-.field-unit{font-size:10px;background:var(--surface3);border:1px solid var(--border);
-  padding:2px 6px;border-radius:4px;text-transform:none;letter-spacing:0;color:var(--faint)}
-.input-wrap{position:relative}
-.input-wrap input{
-  width:100%;padding:9px 12px;background:var(--surface3);border:1px solid var(--border);
-  border-radius:var(--radius-sm);font-size:13px;color:var(--text);outline:none;
-}
-.input-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.input-wrap input::placeholder{color:var(--faint)}
-.input-prefix{
-  position:absolute;left:10px;top:50%;transform:translateY(-50%);
-  font-size:12px;color:var(--muted);font-family:var(--font-mono);pointer-events:none;
-}
-.input-prefix~input{padding-left:26px}
-.section-label{
-  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
-  color:var(--faint);padding:4px 0;border-bottom:1px solid var(--divider);margin-bottom:12px;
-}
-.solve-btn{
-  width:100%;padding:12px;border-radius:var(--radius-md);font-size:14px;font-weight:600;
-  background:linear-gradient(135deg,var(--teal),var(--primary),var(--purple));color:#fff;
-  box-shadow:var(--shadow-sm);letter-spacing:0.2px;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.solve-btn:hover{filter:brightness(1.08);box-shadow:0 0 0 4px var(--primary-glow),var(--shadow-md);transform:translateY(-1px)}
-.solve-btn:active{transform:translateY(0)}
-.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.result-chip{
-  background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-md);
-  padding:12px;text-align:center;position:relative;overflow:hidden;
-}
-.result-chip::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--chip-a),var(--chip-b));
-}
-.result-chip.blue{--chip-a:var(--primary);--chip-b:var(--purple)}
-.result-chip.green{--chip-a:var(--accent);--chip-b:#39d353}
-.result-chip.warn{--chip-a:var(--warn);--chip-b:var(--orange)}
-.result-chip.purple{--chip-a:var(--purple);--chip-b:var(--primary)}
-.chip-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-.chip-value{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--text)}
-.chip-unit{font-size:11px;color:var(--muted);margin-top:2px}
-.result-chip.answer{grid-column:1/-1;background:linear-gradient(135deg,rgba(88,166,255,0.07),rgba(188,140,255,0.07));border-color:var(--primary)}
-.chip-value.answer-val{font-size:28px;color:var(--primary)}
-.fbd-wrap{
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:0;overflow:hidden;
-}
-.fbd-header{
-  padding:14px 18px;border-bottom:1px solid var(--border);display:flex;
-  align-items:center;justify-content:space-between;
-}
-.fbd-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.fbd-tabs{display:flex;gap:4px;background:var(--surface3);padding:3px;border-radius:var(--radius-sm)}
-.fbd-tab{
-  padding:5px 12px;border-radius:4px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;
-}
-.fbd-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-.canvas-container{padding:18px;display:flex;justify-content:center;align-items:center;min-height:420px;position:relative;background:radial-gradient(circle at top, color-mix(in srgb, var(--primary-glow) 60%, transparent), transparent 42%)}
-canvas.fbd{border-radius:var(--radius-md);display:block;max-width:100%;background:linear-gradient(180deg,color-mix(in srgb, var(--surface) 88%, white 12%),var(--surface));box-shadow:0 10px 30px rgba(0,0,0,0.18);transition:transform .35s ease, opacity .35s ease, filter .35s ease}
-canvas.fbd.drawing{opacity:.42;transform:scale(.985);filter:saturate(.9) blur(.6px)}
-.fbd-build{position:absolute;inset:auto 28px 26px auto;padding:7px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.35px;background:color-mix(in srgb, var(--surface3) 80%, black 20%);border:1px solid var(--border);color:var(--text);backdrop-filter:blur(8px);display:none;align-items:center;gap:8px}
-.fbd-build.active{display:flex}
-.fbd-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent-glow);animation:ping 1.2s infinite}
-@keyframes ping{0%{transform:scale(1);box-shadow:0 0 0 0 var(--accent-glow)}70%{transform:scale(1.15);box-shadow:0 0 0 8px transparent}100%{transform:scale(1)}}
-.steps-list{display:flex;flex-direction:column;gap:0}
-.step{
-  display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--divider);
-  position:relative;
-}
-.step:last-child{border-bottom:none}
-.step-num{
-  width:26px;height:26px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);
-  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;color:var(--muted);font-family:var(--font-mono);
-}
-.step.active .step-num{background:var(--primary);border-color:var(--primary);color:#fff}
-.step-content{flex:1}
-.step-title{font-size:13px;font-weight:600;margin-bottom:3px}
-.step-desc{font-size:12px;color:var(--muted);line-height:1.5}
-.math{
-  font-family:var(--font-mono);background:var(--surface3);padding:8px 12px;
-  border-radius:var(--radius-sm);border-left:3px solid var(--primary);
-  font-size:12px;margin-top:6px;color:var(--primary);line-height:1.7;
-}
-.equation-box{
-  background:linear-gradient(135deg,rgba(88,166,255,0.06),rgba(188,140,255,0.06));
-  border:1px solid rgba(88,166,255,0.2);border-radius:var(--radius-md);padding:14px 16px;
-  font-family:var(--font-mono);font-size:13px;color:var(--text);line-height:1.8;
-}
-.badge{
-  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--radius-full,20px);
-  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;
-}
-.badge-blue{background:var(--primary-glow);color:var(--primary)}
-.badge-green{background:var(--accent-glow);color:var(--accent)}
-.notice{
-  padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;color:var(--muted);
-  border:1px solid var(--divider);background:var(--surface3);display:flex;gap:8px;align-items:flex-start;
-}
-.notice.info{border-color:rgba(88,166,255,0.2);background:rgba(88,166,255,0.04)}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--faint);border-radius:4px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.animate-in{animation:fadeIn 0.3s ease forwards}
-@keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 var(--primary-glow)}50%{box-shadow:0 0 0 8px transparent}}
-.solving{animation:pulse-glow 1s ease infinite}
-@media(max-width:900px){
-  .layout{grid-template-columns:1fr}
-  .sidebar{border-right:none;border-bottom:1px solid var(--border)}
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:radial-gradient(circle at top, color-mix(in srgb, var(--primary-glow) 55%, transparent), transparent 28%),var(--bg);color:var(--text);min-height:100vh}
+button,input{font:inherit;color:inherit}
+button{border:none;background:none;cursor:pointer}
+input{outline:none}
+.header{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 90%, var(--primary) 10%),var(--surface));backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--primary),var(--purple));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:var(--shadow-sm)}
+.brand h1{font-size:15px;font-weight:700}.brand p{font-size:11px;color:var(--muted)}
+.header-actions{display:flex;gap:10px;align-items:center}.badge{padding:6px 10px;border-radius:999px;background:var(--primary-glow);color:var(--primary);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}.theme-toggle{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);display:grid;place-items:center}
+.layout{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 69px)}
+.sidebar{padding:20px;border-right:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%, transparent);display:flex;flex-direction:column;gap:18px}
+.main{padding:22px;display:flex;flex-direction:column;gap:20px}
+.card{background:linear-gradient(180deg,color-mix(in srgb,var(--surface2) 95%, white 5%),var(--surface2));border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.card-pad{padding:18px}.card-head{display:flex;gap:10px;align-items:center;margin-bottom:14px}.icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px}.i-blue{background:var(--primary-glow);color:var(--primary)}.i-green{background:var(--accent-glow);color:var(--accent)}.i-warn{background:var(--warn-glow);color:var(--warn)}.i-purple{background:rgba(153,135,255,.14);color:var(--purple)}
+.card-title{font-size:13px;font-weight:700}.card-sub{font-size:11px;color:var(--muted)}
+.section-label{font-size:10px;font-weight:800;color:var(--faint);letter-spacing:.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--divider);margin:14px 0 12px}
+.field{margin-bottom:12px}.field label{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px}.unit{font-size:10px;color:var(--faint);background:var(--surface3);padding:2px 7px;border:1px solid var(--border);border-radius:999px;text-transform:none}
+.input-wrap{position:relative}.input-wrap input{width:100%;padding:10px 12px;background:var(--surface3);border:1px solid var(--border);border-radius:12px}.input-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-glow)}
+.solve-btn{width:100%;padding:13px 16px;border-radius:14px;color:#fff;font-weight:800;letter-spacing:.2px;background:linear-gradient(135deg,var(--teal),var(--primary),var(--purple));box-shadow:var(--shadow-sm);transform:translateY(0);transition:.25s ease}
+.solve-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.help{font-size:11px;color:var(--muted);line-height:1.6;background:var(--surface3);border:1px solid var(--border);padding:10px 12px;border-radius:12px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chip{padding:12px;border-radius:14px;background:var(--surface3);border:1px solid var(--border);text-align:center;position:relative;overflow:hidden}.chip:before{content:'';position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--primary),var(--purple))}.chip .k{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}.chip .v{font-family:var(--font-mono);font-size:20px;font-weight:700}.chip .u{font-size:11px;color:var(--muted)}.chip.answer{grid-column:1/-1;border-color:rgba(99,199,255,.34);background:linear-gradient(135deg,rgba(99,199,255,.08),rgba(153,135,255,.08))}.chip.answer .v{font-size:28px;color:var(--primary)}
+.fbd-wrap{overflow:hidden}.fbd-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border)}.tabs{display:flex;gap:4px;background:var(--surface3);padding:4px;border-radius:12px}.tab{padding:7px 12px;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);transition:.25s ease}.tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.canvas-zone{position:relative;padding:20px;min-height:470px;display:grid;place-items:center;background:radial-gradient(circle at top, color-mix(in srgb,var(--primary-glow) 55%, transparent), transparent 35%)}
+canvas{max-width:100%;height:auto;display:block;border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 88%, white 12%),var(--surface));box-shadow:var(--shadow-md);opacity:1;transform:translateY(0) scale(1);transition:opacity .35s ease,transform .45s cubic-bezier(.16,1,.3,1),filter .35s ease}
+canvas.switching{opacity:.08;transform:translateY(8px) scale(.985);filter:blur(1.5px) saturate(.92)}
+.build-badge{position:absolute;right:30px;bottom:28px;padding:8px 12px;border-radius:999px;background:color-mix(in srgb,var(--surface3) 85%, black 15%);border:1px solid var(--border);display:none;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.35px;backdrop-filter:blur(10px)}.build-badge.active{display:flex}.dot{width:8px;height:8px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 0 var(--accent-glow);animation:ping 1.2s infinite}
+@keyframes ping{0%{transform:scale(1);box-shadow:0 0 0 0 var(--accent-glow)}70%{transform:scale(1.12);box-shadow:0 0 0 8px transparent}100%{transform:scale(1)}}
+.steps{display:flex;flex-direction:column}.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--divider)}.step:last-child{border-bottom:none}.n{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:var(--surface3);border:1px solid var(--border);font:700 11px var(--font-mono);color:var(--muted)}.step.active .n{background:var(--primary);border-color:var(--primary);color:white}.st{font-size:13px;font-weight:700;margin-bottom:4px}.sd{font-size:12px;color:var(--muted);line-height:1.55}.math{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--surface3);border-left:3px solid var(--primary);font:12px var(--font-mono);color:var(--primary);line-height:1.7;overflow:auto}
+.eq{padding:15px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(99,199,255,.08),rgba(153,135,255,.08));border:1px solid rgba(99,199,255,.22);font:13px var(--font-mono);line-height:1.8}
+.notice{padding:12px;border-radius:12px;background:var(--surface3);border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
-
 <header class="header">
-  <div class="header-brand">
+  <div class="brand">
     <div class="logo">SM</div>
-    <div class="brand-text">
+    <div>
       <h1>StaticsMaster</h1>
-      <p>GitHub Pages Ready · Problem 2/40</p>
+      <p>Wheelbarrow Moment Solver · Premium Animated Edition</p>
     </div>
   </div>
   <div class="header-actions">
-    <span class="badge badge-blue">⚡ Engineering Mechanics</span>
-    <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme" title="Toggle theme">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
+    <div class="badge">Engineering Mechanics</div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
   </div>
 </header>
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon icon-blue">📐</div>
+    <div class="card card-pad">
+      <div class="card-head">
+        <div class="icon i-blue">📐</div>
         <div>
-          <div class="card-title">Problem Configuration</div>
-          <div class="card-subtitle">Wheelbarrow · Statics · Corrected geometry</div>
+          <div class="card-title">Problem Inputs</div>
+          <div class="card-sub">Teacher can change values and even labels/symbols</div>
         </div>
       </div>
 
-      <div class="section-label">Geometry</div>
-      <div class="field">
-        <div class="field-label">Handle Height (vertical) <span class="field-unit">mm</span></div>
-        <div class="input-wrap"><input type="number" id="inp_h" value="650" step="1"></div>
-      </div>
-      <div class="field">
-        <div class="field-label">Horizontal Distance A→G <span class="field-unit">mm</span></div>
-        <div class="input-wrap"><input type="number" id="inp_d" value="925" step="1"></div>
-      </div>
-      <div class="field">
-        <div class="field-label">Horizontal Distance G→B <span class="field-unit">mm</span></div>
-        <div class="input-wrap"><input type="number" id="inp_cg" value="200" step="1"></div>
-      </div>
+      <div class="section-label">Numeric values</div>
+      <div class="field"><label>Handle height <span class="unit">mm</span></label><div class="input-wrap"><input id="inp_h" value="650"></div></div>
+      <div class="field"><label>Horizontal A→G <span class="unit">mm</span></label><div class="input-wrap"><input id="inp_d" value="925"></div></div>
+      <div class="field"><label>Horizontal G→B <span class="unit">mm</span></label><div class="input-wrap"><input id="inp_cg" value="200"></div></div>
+      <div class="field"><label>Force angle from vertical <span class="unit">deg</span></label><div class="input-wrap"><input id="inp_alpha" value="60"></div></div>
+      <div class="field"><label>Bar angle from horizontal <span class="unit">deg</span></label><div class="input-wrap"><input id="inp_beta" value="20"></div></div>
+      <div class="field"><label>Mass <span class="unit">kg</span></label><div class="input-wrap"><input id="inp_mass" value="85"></div></div>
+      <div class="field"><label>Gravity <span class="unit">m/s²</span></label><div class="input-wrap"><input id="inp_g" value="9.81"></div></div>
 
-      <div class="section-label" style="margin-top:14px">Angles</div>
-      <div class="field">
-        <div class="field-label">Handle angle α from vertical <span class="field-unit">°</span></div>
-        <div class="input-wrap"><input type="number" id="inp_alpha" value="60" step="1"></div>
-      </div>
-      <div class="field">
-        <div class="field-label">Frame tilt β from horizontal <span class="field-unit">°</span></div>
-        <div class="input-wrap"><input type="number" id="inp_beta" value="20" step="1"></div>
-      </div>
+      <div class="section-label">Custom symbols / labels</div>
+      <div class="field"><label>Force label <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_force" value="F"></div></div>
+      <div class="field"><label>Weight label <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_weight" value="mg"></div></div>
+      <div class="field"><label>Reaction label <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_reaction" value="R_B"></div></div>
+      <div class="field"><label>Output force symbol <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_output" value="$"></div></div>
 
-      <div class="section-label" style="margin-top:14px">Loading</div>
-      <div class="field">
-        <div class="field-label">Total Mass (wheelbarrow + load) <span class="field-unit">kg</span></div>
-        <div class="input-wrap"><input type="number" id="inp_mass" value="85" step="0.1"></div>
-      </div>
-      <div class="field">
-        <div class="field-label">Gravity g <span class="field-unit">m/s²</span></div>
-        <div class="input-wrap"><input type="number" id="inp_g" value="9.81" step="0.01"></div>
-      </div>
-
-      <button class="solve-btn" id="solveBtn" onclick="solve()" style="margin-top:18px">Solve & Visualize</button>
+      <button class="solve-btn" id="solveBtn">Solve & Visualize</button>
+      <div class="help" style="margin-top:12px">Any text is allowed in the symbol fields, including alphabets, names, or special characters like <strong>$</strong>, <strong>#</strong>, <strong>@</strong>, etc. The calculation fields still need valid numbers, because physics cannot be solved from text-only values. The output symbol can be whatever label your professor wants.</div>
     </div>
 
-    <div id="resultCard" class="card" style="display:none">
-      <div class="card-header">
-        <div class="card-icon icon-green">✅</div>
-        <div>
-          <div class="card-title">Results</div>
-          <div class="card-subtitle">Equilibrium Analysis</div>
-        </div>
+    <div class="card card-pad" id="resultCard" style="display:none">
+      <div class="card-head">
+        <div class="icon i-green">✅</div>
+        <div><div class="card-title">Results</div><div class="card-sub">Moment equilibrium about B</div></div>
       </div>
       <div class="result-grid">
-        <div class="result-chip blue"><div class="chip-label">Weight</div><div class="chip-value" id="res_W">—</div><div class="chip-unit">N</div></div>
-        <div class="result-chip purple"><div class="chip-label">Arm (handle)</div><div class="chip-value" id="res_dF">—</div><div class="chip-unit">m</div></div>
-        <div class="result-chip warn"><div class="chip-label">Arm (weight)</div><div class="chip-value" id="res_dW">—</div><div class="chip-unit">m</div></div>
-        <div class="result-chip green"><div class="chip-label">M_weight (B)</div><div class="chip-value" id="res_Mw">—</div><div class="chip-unit">N·m</div></div>
-        <div class="result-chip answer"><div class="chip-label">Required Force F at A</div><div class="chip-value answer-val" id="res_F">—</div><div class="chip-unit">N <span id="res_F_kgf" style="color:var(--muted);font-size:11px"></span></div></div>
+        <div class="chip"><div class="k">Weight</div><div class="v" id="res_W">—</div><div class="u">N</div></div>
+        <div class="chip"><div class="k">Moment arm of force</div><div class="v" id="res_dF">—</div><div class="u">m</div></div>
+        <div class="chip"><div class="k">Moment arm of weight</div><div class="v" id="res_dW">—</div><div class="u">m</div></div>
+        <div class="chip"><div class="k">Weight moment</div><div class="v" id="res_Mw">—</div><div class="u">N·m</div></div>
+        <div class="chip answer"><div class="k">Required output</div><div class="v" id="res_F">—</div><div class="u" id="res_symbol">F (N)</div></div>
       </div>
     </div>
   </aside>
 
-  <main class="main-content">
-    <div class="fbd-wrap">
+  <main class="main">
+    <section class="card fbd-wrap">
       <div class="fbd-header">
-        <div class="fbd-title">Free Body Diagram</div>
-        <div class="fbd-tabs">
-          <div class="fbd-tab active" id="tab-fbd" onclick="switchTab('fbd')">Full FBD</div>
-          <div class="fbd-tab" id="tab-geom" onclick="switchTab('geom')">Geometry</div>
-          <div class="fbd-tab" id="tab-moment" onclick="switchTab('moment')">Moments</div>
-        </div>
-      </div>
-      <div class="canvas-container">
-        <canvas class="fbd" id="fbdCanvas" width="760" height="430"></canvas>
-        <div class="fbd-build" id="fbdBuildBadge"><span class="fbd-dot"></span>Drawing free body diagram...</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon icon-warn">📝</div>
         <div>
-          <div class="card-title">Step-by-Step Solution</div>
-          <div class="card-subtitle">Moment equilibrium about point B</div>
+          <div class="card-title">Animated Free Body Diagram</div>
+          <div class="card-sub">Smooth part-by-part drawing + smooth tab transition</div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-tab="fbd">Full FBD</button>
+          <button class="tab" data-tab="geom">Geometry</button>
+          <button class="tab" data-tab="moment">Moments</button>
         </div>
       </div>
-      <div id="stepsContainer">
-        <div class="notice info">
-          <span>ℹ️</span>
-          <span>Enter your values in the sidebar and click <strong>Solve &amp; Visualize</strong> to see the complete worked solution.</span>
-        </div>
+      <div class="canvas-zone">
+        <canvas id="fbdCanvas" width="860" height="480"></canvas>
+        <div class="build-badge" id="buildBadge"><span class="dot"></span><span id="buildText">Drawing FBD...</span></div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon icon-purple">∑</div>
-        <div>
-          <div class="card-title">Governing Equation</div>
-          <div class="card-subtitle">Static Equilibrium — Net Moment = 0</div>
-        </div>
+    <section class="card card-pad">
+      <div class="card-head">
+        <div class="icon i-warn">📝</div>
+        <div><div class="card-title">Step-by-Step Solution</div><div class="card-sub">Works with custom labels too</div></div>
       </div>
-      <div class="equation-box" id="eqBox">
-        ΣM_B = 0<br>
-        F · d_F − W · d_W = 0
+      <div id="stepsWrap" class="notice">Enter values and click <strong>Solve &amp; Visualize</strong> to generate the complete worked solution and animated free body diagram.</div>
+    </section>
+
+    <section class="card card-pad">
+      <div class="card-head">
+        <div class="icon i-purple">∑</div>
+        <div><div class="card-title">Equation Box</div><div class="card-sub">General moment equilibrium</div></div>
       </div>
-    </div>
+      <div class="eq" id="eqBox">\n\u03A3M_B = 0\n<br>Output · d_F = W · d_W</div>
+    </section>
   </main>
 </div>
 
 <script>
-(function(){
-  const btn=document.querySelector('[data-theme-toggle]');
-  const root=document.documentElement;
-  let d=root.getAttribute('data-theme')||'dark';
-  function updateIcon(){
-    btn.innerHTML=d==='dark'
-      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const root=document.documentElement;
+const themeToggle=document.getElementById('themeToggle');
+function paintThemeIcon(){
+  const dark=root.getAttribute('data-theme')!=='light';
+  themeToggle.innerHTML = dark
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+}
+paintThemeIcon();
+themeToggle.addEventListener('click',()=>{root.setAttribute('data-theme',root.getAttribute('data-theme')==='light'?'dark':'light');paintThemeIcon(); if(window.lastParams) animateRedraw(window.lastParams,window.activeTab||'fbd',true); else drawPlaceholder();});
+
+const canvas=document.getElementById('fbdCanvas');
+const ctx=canvas.getContext('2d');
+const buildBadge=document.getElementById('buildBadge');
+window.activeTab='fbd';
+window.animFrame=0;
+window.lastParams=null;
+
+function safeText(v,fallback){
+  const s=(v??'').toString();
+  return s.length?s:fallback;
+}
+function parseNumber(id,name){
+  const raw=document.getElementById(id).value.trim();
+  const val=Number(raw);
+  if(!Number.isFinite(val)) throw new Error(name+' must be a valid numeric value.');
+  return val;
+}
+function deg(v){return v*Math.PI/180}
+function fmt(v,d=3){return Number(v).toFixed(d)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function ease(t){return 1-Math.pow(1-t,3)}
+function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function part(t,a,b){if(t<=a) return 0; if(t>=b) return 1; return easeInOut((t-a)/(b-a));}
+function getTheme(){
+  const dark=root.getAttribute('data-theme')!=='light';
+  return dark?{
+    bg:'#0f1629',text:'#edf4ff',muted:'#9aa7c4',line:'#87b8ff',bar:'#7aa9ff',ground:'#667692',force:'#42e3ba',weight:'#ff7f8f',reaction:'#ffc85c',dim:'#9aa7c4',box:'rgba(10,16,32,.74)',wheel:'#2a3a58',tray:'#233252',fill:'#dbe7ff'
+  }:{
+    bg:'#ffffff',text:'#17233b',muted:'#60718f',line:'#2f4e88',bar:'#3768c4',ground:'#8a97ab',force:'#0ca881',weight:'#d94862',reaction:'#c98b00',dim:'#657594',box:'rgba(255,255,255,.9)',wheel:'#b9c9e9',tray:'#dfe9fb',fill:'#17233b'
   }
-  btn.addEventListener('click',()=>{
-    d=d==='dark'?'light':'dark';
-    root.setAttribute('data-theme',d);
-    updateIcon();
-    if(window._lastParams) animateFBDRedraw(window._lastParams,window._activeTab||'fbd');
-  });
-  updateIcon();
-})();
+}
+function clearCanvas(){const t=getTheme();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=t.bg;ctx.fillRect(0,0,canvas.width,canvas.height)}
+function lineProg(x1,y1,x2,y2,t){const p=ease(clamp(t,0,1));const x=x1+(x2-x1)*p,y=y1+(y2-y1)*p;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x,y);ctx.stroke();return [x,y]}
+function arrowProg(x1,y1,x2,y2,color,t,label='',dx=8,dy=-8){ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.lineCap='round';const [px,py]=lineProg(x1,y1,x2,y2,t);if(t>.82){const k=(t-.82)/.18;const a=Math.atan2(y2-y1,x2-x1),s=11*k;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-s*Math.cos(a-Math.PI/6),py-s*Math.sin(a-Math.PI/6));ctx.lineTo(px-s*Math.cos(a+Math.PI/6),py-s*Math.sin(a+Math.PI/6));ctx.closePath();ctx.fill();}if(label&&t>.9){ctx.globalAlpha=(t-.9)/.1;ctx.font='700 15px Inter,sans-serif';ctx.fillText(label,x2+dx,y2+dy)}ctx.restore();}
+function textFade(text,x,y,t,font,color,align='left'){if(t<=0)return;ctx.save();ctx.globalAlpha=clamp(t,0,1);ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.restore();}
+function pointPop(x,y,label,color,t){if(t<=0)return;ctx.save();const r=5*ease(clamp(t,0,1));ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();if(t>.82){ctx.font='700 13px Inter,sans-serif';ctx.fillStyle=color;ctx.fillText(label,x+8,y-8)}ctx.restore();}
+function dimLine(x1,y,x2,label,color,offset=0,t=1){ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.4;ctx.setLineDash([6,5]);lineProg(x1,y+offset,x2,y+offset,t);ctx.setLineDash([]);if(t>.9){ctx.font='11px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(label,(x1+x2)/2,y+offset-8)}ctx.restore();}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 
-window._activeTab='fbd';
-window._animFrame=0;
-
-function switchTab(tab){
-  window._activeTab=tab;
-  ['fbd','geom','moment'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-  });
-  if(window._lastParams) animateFBDRedraw(window._lastParams,tab);
-  else drawDefaultFBD(tab);
+function drawPlaceholder(){
+  clearCanvas();
+  const t=getTheme();
+  textFade('Enter values and click Solve & Visualize',canvas.width/2,canvas.height/2-8,1,'700 18px Inter,sans-serif',t.text,'center');
+  textFade('Smooth animated FBD will appear here',canvas.width/2,canvas.height/2+18,1,'12px Inter,sans-serif',t.muted,'center');
 }
 
-function deg2rad(d){return d*Math.PI/180}
-function fmtN(v){return v.toFixed(1)}
-function fmtM(v){return v.toFixed(3)}
-
-function animateFBDRedraw(params, tab){
-  const canvas=document.getElementById('fbdCanvas');
-  const badge=document.getElementById('fbdBuildBadge');
-  if(window._animFrame) cancelAnimationFrame(window._animFrame);
-  canvas.classList.add('drawing');
-  badge.classList.add('active');
-  const start=performance.now();
-  const duration=1400;
-  function step(now){
-    const t=Math.min(1,(now-start)/duration);
-    drawFBD(params, tab, t);
-    if(t<1){
-      window._animFrame=requestAnimationFrame(step);
-    }else{
-      canvas.classList.remove('drawing');
-      setTimeout(()=>badge.classList.remove('active'),180);
-      window._animFrame=0;
-    }
-  }
-  window._animFrame=requestAnimationFrame(step);
-}
-
-function solve(){
-  const H=parseFloat(document.getElementById('inp_h').value);
-  const D=parseFloat(document.getElementById('inp_d').value);
-  const CG=parseFloat(document.getElementById('inp_cg').value);
-  const alpha=parseFloat(document.getElementById('inp_alpha').value);
-  const beta=parseFloat(document.getElementById('inp_beta').value);
-  const mass=parseFloat(document.getElementById('inp_mass').value);
-  const g=parseFloat(document.getElementById('inp_g').value);
-
-  if([H,D,CG,alpha,beta,mass,g].some(isNaN)||H<=0||D<=0||mass<=0){
-    alert('Please fill all fields with valid positive numbers.');
-    return;
-  }
-
-  const H_m=H/1000, AG_m=D/1000, GB_m=CG/1000;
-  const AB_m=AG_m+GB_m;
-  const alpha_r=deg2rad(alpha), beta_r=deg2rad(beta);
+function collectParams(){
+  const H=parseNumber('inp_h','Handle height');
+  const D=parseNumber('inp_d','Horizontal A→G');
+  const CG=parseNumber('inp_cg','Horizontal G→B');
+  const alpha=parseNumber('inp_alpha','Force angle');
+  const beta=parseNumber('inp_beta','Bar angle');
+  const mass=parseNumber('inp_mass','Mass');
+  const g=parseNumber('inp_g','Gravity');
+  if(H<=0||D<=0||CG<0||mass<=0||g<=0) throw new Error('Numeric input values must be physically meaningful and positive.');
+  const forceLabel=safeText(document.getElementById('lbl_force').value,'F');
+  const weightLabel=safeText(document.getElementById('lbl_weight').value,'mg');
+  const reactionLabel=safeText(document.getElementById('lbl_reaction').value,'R_B');
+  const outputLabel=safeText(document.getElementById('lbl_output').value,'F');
+  const Hm=H/1000, AG=D/1000, GB=CG/1000, AB=AG+GB;
+  const alphaR=deg(alpha), betaR=deg(beta);
+  const thetaF=Math.PI-betaR-alphaR;
+  const ux=Math.cos(thetaF), uy=Math.sin(thetaF);
   const W=mass*g;
+  const dF=Math.abs((-AB)*uy-(Hm)*ux);
+  const dW=GB;
+  const MW=W*dW;
+  const F=MW/dF;
+  return {H,D,CG,alpha,beta,mass,g,Hm,AG,GB,AB,alphaR,betaR,thetaF,ux,uy,W,dF,dW,MW,F,forceLabel,weightLabel,reactionLabel,outputLabel};
+}
 
-  const thetaF=Math.PI-beta_r-alpha_r;
-  const Fx_unit=Math.cos(thetaF);
-  const Fy_unit=Math.sin(thetaF);
-  const M_F_coeff=(-AB_m)*Fy_unit-(H_m)*Fx_unit;
-  const dF_actual=Math.abs(M_F_coeff);
-  const dW=GB_m;
-  const M_W=W*dW;
-  const F=M_W/dF_actual;
-
-  const params={H,D,CG,alpha,beta,mass,g,H_m,AG_m,GB_m,AB_m,alpha_r,beta_r,W,dF:dF_actual,dW,M_W,F};
-  window._lastParams=params;
-
-  document.getElementById('res_W').textContent=fmtN(W);
-  document.getElementById('res_dF').textContent=dF_actual.toFixed(4);
-  document.getElementById('res_dW').textContent=fmtM(dW);
-  document.getElementById('res_Mw').textContent=fmtN(M_W);
-  document.getElementById('res_F').textContent=fmtN(F);
-  document.getElementById('res_F_kgf').textContent='(≈ '+(F/9.81).toFixed(2)+' kgf)';
-
+function renderResults(p){
   document.getElementById('resultCard').style.display='';
-  animateFBDRedraw(params, window._activeTab||'fbd');
+  document.getElementById('res_W').textContent=fmt(p.W,1);
+  document.getElementById('res_dF').textContent=fmt(p.dF,4);
+  document.getElementById('res_dW').textContent=fmt(p.dW,3);
+  document.getElementById('res_Mw').textContent=fmt(p.MW,1);
+  document.getElementById('res_F').textContent=fmt(p.F,1);
+  document.getElementById('res_symbol').textContent=`${p.outputLabel} (N)`;
+  document.getElementById('eqBox').innerHTML=`\u03A3M_B = 0<br>${p.outputLabel} · d_F = W · d_W<br>${p.outputLabel} = (W · d_W) / d_F`;
+  document.getElementById('stepsWrap').innerHTML=`
+    <div class="steps">
+      <div class="step active"><div class="n">1</div><div><div class="st">Compute weight</div><div class="sd">The total downward load is obtained from mass and gravity.</div><div class="math">W = m × g = ${fmt(p.mass,2)} × ${fmt(p.g,2)} = ${fmt(p.W,1)} N</div></div></div>
+      <div class="step active"><div class="n">2</div><div><div class="st">Locate point B moment arm for weight</div><div class="sd">The weight acts vertically through G, so its perpendicular distance from B is the horizontal distance G→B.</div><div class="math">d_W = ${fmt(p.dW,3)} m</div></div></div>
+      <div class="step active"><div class="n">3</div><div><div class="st">Find perpendicular arm of ${p.outputLabel}</div><div class="sd">The applied force line creates a perpendicular distance from B to the force direction.</div><div class="math">d_F = ${fmt(p.dF,4)} m</div></div></div>
+      <div class="step active"><div class="n">4</div><div><div class="st">Use moment equilibrium about B</div><div class="sd">For equilibrium, clockwise and counterclockwise moments must balance.</div><div class="math">${p.outputLabel} × d_F = W × d_W</div></div></div>
+      <div class="step active"><div class="n">5</div><div><div class="st">Solve for ${p.outputLabel}</div><div class="sd">Substitute the computed values into the equilibrium expression.</div><div class="math">${p.outputLabel} = (${fmt(p.W,1)} × ${fmt(p.dW,3)}) / ${fmt(p.dF,4)} = ${fmt(p.F,1)} N</div></div></div>
+    </div>`;
 }
 
-function drawFBD(p, tab){
-  const canvas=document.getElementById('fbdCanvas');
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(tab==='fbd') drawFullFBD(ctx,p,canvas.width,canvas.height);
-  else if(tab==='geom') drawGeom(ctx,p,canvas.width,canvas.height);
-  else drawMomentDiag(ctx,p,canvas.width,canvas.height);
+function drawFullFBD(p,prog){
+  clearCanvas(); const t=getTheme();
+  const Bx=680, By=360; const scale=420/p.AB;
+  const Ax=Bx-p.AB*scale, Ay=By-p.Hm*scale;
+  const Gx=Bx-p.GB*scale, Gy=Ay+(Ax!==Bx?(Gx-Ax)*(By-Ay)/(Bx-Ax):0);
+  textFade('Free Body Diagram - Wheelbarrow',20,28,part(prog,0,.10),'700 16px Inter,sans-serif',t.text);
+  textFade('Smooth animated build of structure, points, arrows and dimensions',20,47,part(prog,.04,.16),'11px Inter,sans-serif',t.muted);
+  ctx.strokeStyle=t.ground; ctx.lineWidth=2; lineProg(60,360,790,360,part(prog,.08,.16));
+  ctx.strokeStyle=t.bar; ctx.lineWidth=9; ctx.lineCap='round'; lineProg(Ax,Ay,Bx,By,part(prog,.12,.28));
+  ctx.strokeStyle=t.line; ctx.lineWidth=3; lineProg(Ax+80,Ay-10,Gx+70,Gy-46,part(prog,.18,.32)); lineProg(Gx+70,Gy-46,Bx-36,By-34,part(prog,.22,.38));
+  ctx.fillStyle=t.tray; if(prog>.30){ctx.globalAlpha=part(prog,.26,.40); roundRect(Ax+75,Ay-44,(Gx+65)-(Ax+75),56,16); ctx.fill(); ctx.globalAlpha=1;}
+  ctx.fillStyle=t.wheel; ctx.strokeStyle=t.line; if(prog>.34){ctx.globalAlpha=part(prog,.32,.46); ctx.beginPath(); ctx.arc(Bx-18,By-28,42,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(Bx-18,By-28,18,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;}
+  pointPop(Ax,Ay,'A',t.fill,part(prog,.26,.38));
+  pointPop(Gx,Gy,'G',t.fill,part(prog,.42,.54));
+  pointPop(Bx,By,'B',t.fill,part(prog,.58,.70));
+  arrowProg(Ax,Ay,Ax+p.ux*120,Ay+p.uy*120,t.force,part(prog,.34,.52),p.forceLabel,10,-8);
+  arrowProg(Gx,Gy-95,Gx,Gy,t.weight,part(prog,.50,.68),p.weightLabel,10,-8);
+  arrowProg(Bx,By+24,Bx,By-82,t.reaction,part(prog,.66,.84),p.reactionLabel,12,-8);
+  dimLine(Ax,391,Bx,`A→B = ${Math.round(p.AB*1000)} mm`,t.dim,0,part(prog,.72,.88));
+  dimLine(Ax,420,Gx,`A→G = ${Math.round(p.AG*1000)} mm`,t.dim,0,part(prog,.76,.92));
+  dimLine(Gx,447,Bx,`G→B = ${Math.round(p.GB*1000)} mm`,t.dim,0,part(prog,.80,.96));
+  if(prog>.82){ctx.save();ctx.globalAlpha=part(prog,.82,1);ctx.fillStyle=t.box;ctx.strokeStyle=t.border||t.dim;roundRect(24,316,235,84,14);ctx.fill();ctx.stroke();ctx.fillStyle=t.text;ctx.font='700 11px Inter,sans-serif';ctx.fillText('Legend',40,337);ctx.font='11px Inter,sans-serif';ctx.fillStyle=t.muted;ctx.fillText(`${p.forceLabel} : Applied force`,40,356);ctx.fillText(`${p.weightLabel} : Weight`,40,374);ctx.fillText(`${p.reactionLabel} : Ground reaction`,40,392);ctx.restore();}
 }
 
-function drawFullFBD(ctx,p,cw,ch){
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,cw,ch);
-  ctx.fillStyle='#17233b';
-  ctx.font='bold 16px Inter,sans-serif';
-  ctx.fillText('Free Body Diagram',20,30);
+function drawGeometry(p,prog){
+  clearCanvas(); const t=getTheme();
+  const Bx=690, By=355; const scale=420/p.AB;
+  const Ax=Bx-p.AB*scale, Ay=By-p.Hm*scale; const Gx=Bx-p.GB*scale, Gy=Ay+(Gx-Ax)*(By-Ay)/(Bx-Ax);
+  textFade('Geometry View - Perpendicular Arms',20,28,part(prog,0,.12),'700 16px Inter,sans-serif',t.text);
+  textFade('Shows d_F and d_W used in moment equilibrium',20,47,part(prog,.04,.16),'11px Inter,sans-serif',t.muted);
+  ctx.strokeStyle=t.bar; ctx.lineWidth=8; lineProg(Ax,Ay,Bx,By,part(prog,.10,.26));
+  pointPop(Ax,Ay,'A',t.fill,part(prog,.22,.34)); pointPop(Gx,Gy,'G',t.fill,part(prog,.36,.48)); pointPop(Bx,By,'B',t.fill,part(prog,.50,.62));
+  const fx2=Ax+p.ux*210, fy2=Ay+p.uy*210;
+  arrowProg(Ax,Ay,fx2,fy2,t.force,part(prog,.28,.46),p.forceLabel,10,-10);
+  ctx.save(); ctx.strokeStyle=t.force; ctx.setLineDash([7,6]); ctx.lineWidth=1.5; lineProg(Ax-p.ux*210,Ay-p.uy*210,fx2,fy2,part(prog,.38,.56)); ctx.restore();
+  ctx.save(); ctx.strokeStyle=t.weight; ctx.setLineDash([7,6]); ctx.lineWidth=1.5; lineProg(Gx,Gy-150,Gx,Gy+90,part(prog,.46,.62)); ctx.restore();
+  const dWpx=(Bx-Gx); if(prog>.60){ctx.save(); ctx.strokeStyle=t.weight; ctx.lineWidth=2.5; lineProg(Gx,By+32,Bx,By+32,part(prog,.60,.76)); ctx.restore(); textFade(`d_W = ${fmt(p.dW,3)} m`,(Gx+Bx)/2,By+24,part(prog,.70,.82),'700 12px Inter,sans-serif',t.weight,'center');}
+  const nx=-p.uy, ny=p.ux; const proj=((Bx-Ax)*nx+(By-Ay)*ny); const Px=Bx-proj*nx, Py=By-proj*ny;
+  if(prog>.56){ctx.save(); ctx.strokeStyle=t.force; ctx.lineWidth=2.5; lineProg(Bx,By,Px,Py,part(prog,.56,.74)); ctx.restore(); textFade(`d_F = ${fmt(p.dF,4)} m`,(Bx+Px)/2+18,(By+Py)/2-10,part(prog,.70,.84),'700 12px Inter,sans-serif',t.force,'center');}
 }
 
-function drawGeom(ctx,p,cw,ch){
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,cw,ch);
-  ctx.fillStyle='#17233b';
-  ctx.font='bold 16px Inter,sans-serif';
-  ctx.fillText('Geometry View',20,30);
+function drawMoments(p,prog){
+  clearCanvas(); const t=getTheme();
+  textFade('Moment Balance About B',20,28,part(prog,0,.12),'700 16px Inter,sans-serif',t.text);
+  textFade('Equal moments in opposite directions for equilibrium',20,47,part(prog,.04,.16),'11px Inter,sans-serif',t.muted);
+  const left=260,right=260,max=Math.max(p.F*p.dF,p.MW,1); const m1=(p.F*p.dF)/max*left, m2=p.MW/max*right;
+  ctx.fillStyle=colorMix(t.force,.12); roundRect(90,120,300,56,14); ctx.fill();
+  ctx.fillStyle=colorMix(t.weight,.12); roundRect(90,220,300,56,14); ctx.fill();
+  ctx.fillStyle=t.force; roundRect(90,120,m1*part(prog,.18,.56),56,14); ctx.fill();
+  ctx.fillStyle=t.weight; roundRect(90,220,m2*part(prog,.44,.82),56,14); ctx.fill();
+  textFade(`${p.outputLabel} × d_F = ${fmt(p.F*p.dF,1)} N·m`,105,154,part(prog,.52,.68),'700 13px Inter,sans-serif','#fff');
+  textFade(`W × d_W = ${fmt(p.MW,1)} N·m`,105,254,part(prog,.78,.94),'700 13px Inter,sans-serif','#fff');
+  textFade('Balanced',640,192,part(prog,.86,1),'800 24px Inter,sans-serif',t.accent||t.text,'center');
 }
 
-function drawMomentDiag(ctx,p,cw,ch){
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,cw,ch);
-  ctx.fillStyle='#17233b';
-  ctx.font='bold 16px Inter,sans-serif';
-  ctx.fillText('Moment Diagram',20,30);
+function colorMix(hex,a){
+  if(hex.startsWith('rgba')) return hex;
+  const c=hex.replace('#',''); const n=parseInt(c.length===3?c.split('').map(x=>x+x).join(''):c,16);
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255; return `rgba(${r},${g},${b},${a})`;
 }
 
-function drawDefaultFBD(){
-  const canvas=document.getElementById('fbdCanvas');
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#777';
-  ctx.font='14px Inter,sans-serif';
-  ctx.textAlign='center';
-  ctx.fillText('Enter values and click Solve & Visualize',canvas.width/2,canvas.height/2);
+function drawScene(p,tab,prog){
+  if(tab==='geom') drawGeometry(p,prog);
+  else if(tab==='moment') drawMoments(p,prog);
+  else drawFullFBD(p,prog);
 }
 
-drawDefaultFBD();
+function animateRedraw(p,tab,switchFx=false){
+  if(window.animFrame) cancelAnimationFrame(window.animFrame);
+  const labelMap={fbd:'Drawing FBD...',geom:'Drawing geometry...',moment:'Drawing moment balance...'};
+  document.getElementById('buildText').textContent=labelMap[tab]||'Drawing...';
+  buildBadge.classList.add('active');
+  if(switchFx) canvas.classList.add('switching');
+  const start=performance.now(); const duration=switchFx?1200:1500;
+  function frame(now){
+    let t=(now-start)/duration; if(t<0)t=0; if(t>1)t=1;
+    if(switchFx && t>.12) canvas.classList.remove('switching');
+    drawScene(p,tab,t);
+    if(t<1) window.animFrame=requestAnimationFrame(frame);
+    else {buildBadge.classList.remove('active');window.animFrame=0;}
+  }
+  window.animFrame=requestAnimationFrame(frame);
+}
+
+function solveNow(){
+  try{
+    const p=collectParams();
+    window.lastParams=p;
+    renderResults(p);
+    animateRedraw(p,window.activeTab||'fbd',false);
+  }catch(err){alert(err.message)}
+}
+
+document.getElementById('solveBtn').addEventListener('click',solveNow);
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+  const tab=btn.dataset.tab;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
+  window.activeTab=tab;
+  if(window.lastParams) animateRedraw(window.lastParams,tab,true); else drawPlaceholder();
+}));
+
+drawPlaceholder();
 </script>
 </body>
 </html>
