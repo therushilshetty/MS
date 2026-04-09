@@ -84,7 +84,6 @@ button,input{font-family:var(--font);color:var(--text);border:none;outline:none;
 .iw input.sym{border-color:rgba(167,139,250,.5);color:var(--violet);font-family:var(--mono);background:rgba(167,139,250,.05)}
 .iw input.err{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-glow)}
 
-/* ─ ANGLE HINT CARDS ─ */
 .angle-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
 .a-card{padding:10px 8px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);text-align:center}
 .a-card svg{display:block;margin:0 auto 5px}
@@ -196,19 +195,15 @@ button,input{font-family:var(--font);color:var(--text);border:none;outline:none;
       </div>
     </div>
 
-    <!-- ANGLE VISUAL LEGEND -->
     <div class="slabel">Angles — what α and β mean</div>
     <div class="angle-hint">
       <div class="a-card">
         <svg width="80" height="58" viewBox="0 0 80 58">
-          <!-- ground -->
           <line x1="4" y1="44" x2="76" y2="44" stroke="#4a607e" stroke-width="1" stroke-dasharray="4,3"/>
           <text x="4" y="54" fill="#4a607e" font-size="7" font-family="Space Grotesk">horizontal</text>
-          <!-- bar -->
           <line x1="62" y1="44" x2="22" y2="18" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
           <text x="16" y="15" fill="#38bdf8" font-size="9" font-family="Space Mono">A</text>
           <text x="64" y="52" fill="#38bdf8" font-size="9" font-family="Space Mono">B</text>
-          <!-- β arc at B -->
           <path d="M 50,44 A 12,12 0 0,0 53,36.5" fill="none" stroke="#fbbf24" stroke-width="2"/>
           <text x="37" y="42" fill="#fbbf24" font-size="11" font-family="Space Mono" font-weight="700">β</text>
         </svg>
@@ -217,14 +212,11 @@ button,input{font-family:var(--font);color:var(--text);border:none;outline:none;
       </div>
       <div class="a-card">
         <svg width="80" height="58" viewBox="0 0 80 58">
-          <!-- bar (dashed reference) -->
           <line x1="10" y1="46" x2="50" y2="20" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4,3"/>
           <text x="48" y="17" fill="#38bdf8" font-size="7" font-family="Space Mono">bar</text>
-          <!-- force arrow -->
           <line x1="10" y1="46" x2="62" y2="26" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
           <polygon points="62,26 54,25 57,33" fill="#34d399"/>
           <text x="64" y="28" fill="#34d399" font-size="9" font-family="Space Mono">F</text>
-          <!-- α arc -->
           <path d="M 26,37 A 18,18 0 0,1 33,28" fill="none" stroke="#34d399" stroke-width="2"/>
           <text x="34" y="42" fill="#34d399" font-size="11" font-family="Space Mono" font-weight="700">α</text>
           <text x="6" y="56" fill="#38bdf8" font-size="9" font-family="Space Mono">A</text>
@@ -370,7 +362,9 @@ function TH(){
     dim:'#a78bfa',arm:'#fb923c',pt:'#38bdf8',
     alpha:'#34d399',beta:'#fbbf24',
     grid:'rgba(56,189,248,.04)',
-    box:'rgba(13,17,23,.9)',boxB:'rgba(56,189,248,.28)',
+    box:'rgba(13,17,23,.92)',boxB:'rgba(56,189,248,.28)',
+    labelBoxBeta:'rgba(251,191,36,.12)',labelBoxBetaB:'rgba(251,191,36,.45)',
+    labelBoxAlpha:'rgba(52,211,153,.12)',labelBoxAlphaB:'rgba(52,211,153,.45)',
   }:{
     bg:'#f0f4fa',cvs:'#ffffff',text:'#0f172a',muted:'#4b6b96',faint:'#94a3b8',
     barS:'#0284c7',bar:'#bfdbfe',ground:'#e2e8f0',gndL:'#94a3b8',
@@ -379,7 +373,9 @@ function TH(){
     dim:'#7c3aed',arm:'#ea580c',pt:'#0284c7',
     alpha:'#059669',beta:'#d97706',
     grid:'rgba(14,80,180,.04)',
-    box:'rgba(255,255,255,.93)',boxB:'rgba(14,80,180,.25)',
+    box:'rgba(255,255,255,.95)',boxB:'rgba(14,80,180,.25)',
+    labelBoxBeta:'rgba(217,119,6,.10)',labelBoxBetaB:'rgba(217,119,6,.5)',
+    labelBoxAlpha:'rgba(5,150,105,.10)',labelBoxAlphaB:'rgba(5,150,105,.5)',
   };
 }
 
@@ -424,7 +420,6 @@ function compute(){
 
   const allNum=[vH,vD,vCG,vA,vB,vM,vG].every(v=>v.isNum);
 
-  // Drawing values (use fallback for symbolic)
   const Hmm=num(vH,650),AGmm=num(vD,925),GBmm=num(vCG,200);
   const alphaD=num(vA,60),betaD=num(vB,20);
   const massN=num(vM,85),gN=num(vG,9.81);
@@ -438,7 +433,6 @@ function compute(){
   const MWnum=Wnum*dWnum;
   const Fnum=allNum?(dFnum>1e-9?MWnum/dFnum:Infinity):null;
 
-  // Symbolic strings
   const sH=isN(vH)?fmtN(Hm,3):str(vH);
   const sAG=isN(vD)?fmtN(AGm,3):str(vD);
   const sGB=isN(vCG)?fmtN(GBm,3):str(vCG);
@@ -472,7 +466,7 @@ function compute(){
 function lbl(id,fb){return((document.getElementById(id).value||'').trim().slice(0,22)||fb);}
 function fmt(v,d=3){if(v===null||v===undefined)return '?';if(!isFinite(v))return '∞';return Number(v).toFixed(d);}
 
-/* ══ VALIDATE — only check non-empty ══ */
+/* ══ VALIDATE ══ */
 function validate(){
   const ids=['inp_h','inp_d','inp_cg','inp_alpha','inp_beta','inp_mass','inp_g'];
   const em=document.getElementById('errMsg');
@@ -489,7 +483,6 @@ function validate(){
   return true;
 }
 
-/* ══ STYLE SYMBOLIC INPUTS ══ */
 function styleInputs(){
   ['inp_h','inp_d','inp_cg','inp_alpha','inp_beta','inp_mass','inp_g'].forEach(id=>{
     const el=document.getElementById(id);
@@ -542,7 +535,7 @@ function showResults(p){
 }
 
 function buildEq(p){
-  const O=p.outputLabel,T=TH();
+  const O=p.outputLabel;
   const cy=dark?'#38bdf8':'#0284c7',vi=dark?'#a78bfa':'#7c3aed',gr=dark?'#34d399':'#059669',rs=dark?'#fb7185':'#e11d48',or=dark?'#fb923c':'#ea580c';
   let html;
   if(p.symbolic){
@@ -673,7 +666,6 @@ function arcAngle(cx,cy,r,sa,ea,col,prog=1,lbl2,lx,ly,lw=2.2){
   ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';
   ctx.shadowColor=col;ctx.shadowBlur=10;
   ctx.beginPath();ctx.arc(cx,cy,r,sa,sa+(ea-sa)*p);ctx.stroke();
-  // arrowhead at end
   if(prog>.65){
     const k=(prog-.65)/.35,endA=sa+(ea-sa)*p;
     const tx=cx+r*Math.cos(endA),ty=cy+r*Math.sin(endA);
@@ -684,15 +676,18 @@ function arcAngle(cx,cy,r,sa,ea,col,prog=1,lbl2,lx,ly,lw=2.2){
     ctx.lineTo(tx-9*Math.cos(tg+.42),ty-9*Math.sin(tg+.42));
     ctx.closePath();ctx.fill();
   }
-  if(lbl2&&prog>.82){
-    ctx.globalAlpha=(prog-.82)/.18;ctx.shadowBlur=0;
-    ctx.fillStyle=col;ctx.font='bold 13px Space Mono,monospace';
-    ctx.textAlign='left';ctx.fillText(lbl2,lx,ly);
-  }
   ctx.restore();
 }
 
-/* ══ DRAW FULL FBD ══ */
+/* ══ ANNOTATION BOX helper ══ */
+function annotBox(x,y,w,h,bgCol,borderCol,alpha){
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.fillStyle=bgCol;ctx.strokeStyle=borderCol;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();
+  ctx.restore();
+}
+
+/* ══ DRAW FULL FBD — FIXED ANGLE LABELS ══ */
 function drawFBD(p,t){
   bgFill();const Th=TH();
   const CW=canvas.width,CH=canvas.height;
@@ -744,54 +739,108 @@ function drawFBD(p,t){
   arw(Bx,By,Bx,By-90,Th.reaction,t3,p.reactionLabel,Bx+9,By-97);
   // Applied force at A
   const fLen=100;
-  const fx=Math.cos(p.thetaF),fy=-Math.sin(p.thetaF); // screen y flipped
+  const fx=Math.cos(p.thetaF),fy=-Math.sin(p.thetaF);
   arw(Ax,Ay,Ax+fx*fLen,Ay+fy*fLen,Th.force,t4,p.forceLabel,Ax+fx*fLen+7,Ay+fy*fLen-7);
 
-  /* ── β at B: angle between bar and horizontal ── */
+  /* ══════════════════════════════════════════════════
+     β at B  — bar angle from horizontal
+     Arc from leftward horizontal (π) to the bar direction.
+     Annotation box sits below-left of B with a tick line.
+  ══════════════════════════════════════════════════ */
   if(t5>0){
-    const barAngle=Math.PI-p.bR; // screen angle of bar from +x (pointing toward A = upper-left)
-    const betaR=58;
-    // Arc from π (pointing left = horizontal left) to barAngle
-    arcAngle(Bx,By,betaR,Math.PI,barAngle,Th.beta,t5,null,0,0,2.5);
+    const barAngle=Math.PI-p.bR; // screen direction of bar from B toward A
+    const betaR=62;
+
     // horizontal dashed reference at B
-    dash(Bx-betaR-18,By,Bx+20,By,Th.beta,t5,[6,4],1.5);
-    if(t5>.55){
-      const k=(t5-.55)/.45;
+    dash(Bx-betaR-22,By,Bx+24,By,Th.beta,t5,[6,4],1.8);
+
+    // arc: from π (left-pointing horizontal) to barAngle
+    arcAngle(Bx,By,betaR,Math.PI,barAngle,Th.beta,t5,null,0,0,2.8);
+
+    if(t5>.35){
+      const k=Math.min(1,(t5-.35)/.65);
+
+      // Large bold β symbol near arc midpoint
       const midA=(Math.PI+barAngle)/2;
-      const lbx=Bx+(betaR+26)*Math.cos(midA),lby=By+(betaR+26)*Math.sin(midA);
+      const symX=Bx+(betaR+28)*Math.cos(midA);
+      const symY=By+(betaR+28)*Math.sin(midA);
       ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.beta;
-      ctx.font='bold 18px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('β',lbx,lby);
-      ctx.font='11px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;
-      ctx.fillText(`β = ${p.sBe}  ← bar angle from horizontal`,Bx-betaR-18,By+betaR+8);
+      ctx.font='bold 24px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor=Th.beta;ctx.shadowBlur=8;
+      ctx.fillText('β',symX,symY);
+      ctx.restore();
+
+      // Annotation box — placed below-right of wheel, away from bar
+      const boxX=Bx+42,boxY=By+44,boxW=230,boxH=44;
+      annotBox(boxX,boxY,boxW,boxH,Th.labelBoxBeta,Th.labelBoxBetaB,k);
+
+      // Tick line from B to box
+      ctx.save();ctx.globalAlpha=k*0.6;ctx.strokeStyle=Th.beta;ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(Bx+4,By+28);ctx.lineTo(boxX+8,boxY);ctx.stroke();
+      ctx.restore();
+
+      ctx.save();ctx.globalAlpha=k;
+      // big yellow β
+      ctx.fillStyle=Th.beta;ctx.font='bold 16px Space Mono,monospace';ctx.textBaseline='top';
+      ctx.fillText('β',boxX+10,boxY+6);
+      // label text
+      ctx.fillStyle=dark?'#fde68a':'#92400e';ctx.font='bold 12px Space Grotesk,sans-serif';
+      ctx.fillText('= bar angle from horizontal',boxX+26,boxY+6);
+      ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+      ctx.fillText(`measured at pivot B  →  β = ${p.sBe}`,boxX+10,boxY+24);
       ctx.restore();
     }
   }
 
-  /* ── α at A: angle between force and bar ── */
+  /* ══════════════════════════════════════════════════
+     α at A  — force angle from bar
+     Arc from bar direction to force direction at handle A.
+     Annotation box sits upper-right of A, clearly separated.
+  ══════════════════════════════════════════════════ */
   if(t4>.25){
-    const k=Math.max(0,(t4-.25)/.75);
-    const barDirScreen=Math.PI-p.bR; // bar direction from A toward B in screen coords
-    const forceDirScreen=Math.atan2(fy,fx); // force direction in screen coords
-    const alphaR=50;
-    arcAngle(Ax,Ay,alphaR,barDirScreen,forceDirScreen,Th.alpha,k,null,0,0,2.5);
-    // bar reference line at A
-    dash(Ax,Ay,Ax+50*Math.cos(barDirScreen),Ay+50*Math.sin(barDirScreen),Th.alpha,k,[5,4],1.5);
-    if(k>.5){
-      const ka=(k-.5)/.5;
-      const midA=(barDirScreen+forceDirScreen)/2;
-      const lax=Ax+(alphaR+26)*Math.cos(midA),lay=Ay+(alphaR+26)*Math.sin(midA);
-      ctx.save();ctx.globalAlpha=ka;ctx.fillStyle=Th.alpha;
-      ctx.font='bold 18px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',lax,lay);
-      ctx.font='11px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;
-      // small note near A
-      ctx.textAlign='left';ctx.fillText(`α = ${p.sAl}  ← force angle from bar`,Ax+10,Ay+40);
-      ctx.restore();
-    }
+    const k=Math.min(1,(t4-.25)/.75);
+    const barDirScreen=Math.PI-p.bR;
+    const forceDirScreen=Math.atan2(fy,fx);
+    const alphaR=52;
+
+    // bar reference dashed line at A
+    dash(Ax,Ay,Ax+56*Math.cos(barDirScreen),Ay+56*Math.sin(barDirScreen),Th.alpha,k,[5,4],1.8);
+
+    // arc from barDirScreen to forceDirScreen
+    arcAngle(Ax,Ay,alphaR,barDirScreen,forceDirScreen,Th.alpha,k,null,0,0,2.8);
+
+    // Large bold α symbol near arc midpoint
+    const midA2=(barDirScreen+forceDirScreen)/2;
+    const symX2=Ax+(alphaR+28)*Math.cos(midA2);
+    const symY2=Ay+(alphaR+28)*Math.sin(midA2);
+    ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.alpha;
+    ctx.font='bold 24px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor=Th.alpha;ctx.shadowBlur=8;
+    ctx.fillText('α',symX2,symY2);
+    ctx.restore();
+
+    // Annotation box — upper-right of handle A
+    const boxX2=Ax+60,boxY2=Ay-58,boxW2=234,boxH2=44;
+    annotBox(boxX2,boxY2,boxW2,boxH2,Th.labelBoxAlpha,Th.labelBoxAlphaB,k);
+
+    // Tick line from A to box
+    ctx.save();ctx.globalAlpha=k*0.6;ctx.strokeStyle=Th.alpha;ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(Ax+6,Ay-6);ctx.lineTo(boxX2+8,boxY2+boxH2);ctx.stroke();
+    ctx.restore();
+
+    ctx.save();ctx.globalAlpha=k;
+    ctx.fillStyle=Th.alpha;ctx.font='bold 16px Space Mono,monospace';ctx.textBaseline='top';
+    ctx.fillText('α',boxX2+10,boxY2+6);
+    ctx.fillStyle=dark?'#6ee7b7':'#065f46';ctx.font='bold 12px Space Grotesk,sans-serif';
+    ctx.fillText('= force angle from bar',boxX2+26,boxY2+6);
+    ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+    ctx.fillText(`measured at handle A  →  α = ${p.sAl}`,boxX2+10,boxY2+24);
+    ctx.restore();
   }
 
   // Result / formula box
   if(t6>.4){
-    const rx=CW-210,ry=14,rw=196,rh=p.symbolic?74:90;
+    const rx=CW-215,ry=14,rw=200,rh=p.symbolic?74:90;
     const ka=(t6-.4)/.6;
     ctx.save();ctx.globalAlpha=ka;
     ctx.fillStyle=Th.box;ctx.strokeStyle=Th.boxB;ctx.lineWidth=1;
@@ -801,7 +850,7 @@ function drawFBD(p,t){
       ctx.fillStyle=Th.dim;ctx.fillText('General Formula:',rx+12,ry+22);
       ctx.fillStyle=dark?'#a78bfa':'#7c3aed';ctx.font='11px Space Mono,monospace';
       const fs=typeof p.sFexpr==='number'?fmt(p.sFexpr,2):String(p.sFexpr);
-      ctx.fillText(`${p.outputLabel} = ${fs.length>20?fs.slice(0,20)+'…':fs}`,rx+12,ry+42);
+      ctx.fillText(`${p.outputLabel} = ${fs.length>22?fs.slice(0,22)+'…':fs}`,rx+12,ry+42);
       ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
       ctx.fillText('Substitute values to compute',rx+12,ry+60);
     } else {
@@ -817,11 +866,11 @@ function drawFBD(p,t){
 
   // Legend
   const legend=[
-    {c:Th.force,   l:`${p.forceLabel}  — Applied force`},
-    {c:Th.weight,  l:`${p.weightLabel}  — Weight`},
-    {c:Th.reaction,l:`${p.reactionLabel}  — Wheel reaction`},
-    {c:Th.beta,    l:`β  — Bar angle from horizontal (at B)`},
-    {c:Th.alpha,   l:`α  — Force angle from bar (at A)`},
+    {c:Th.force,   l:`${p.forceLabel}  — Applied force at A`},
+    {c:Th.weight,  l:`${p.weightLabel}  — Weight at G`},
+    {c:Th.reaction,l:`${p.reactionLabel}  — Wheel reaction at B`},
+    {c:Th.beta,    l:`β  — Bar angle from horizontal  (at B)`},
+    {c:Th.alpha,   l:`α  — Force angle from bar  (at A)`},
   ];
   ctx.save();ctx.globalAlpha=t6;
   legend.forEach((it,i)=>{
@@ -869,22 +918,59 @@ function drawGeom(p,t){
     txt((Gx+Bx)/2,By+60,`GB = ${p.vCG.isNum?fmt(p.GBm,3)+'m':p.sGB}`,Th.reaction,'bold 11px Space Mono,monospace',k,'center');
   }
 
-  // β arc at B
+  // β arc at B — with annotation box
   if(t4>0){
     const barA=Math.PI-p.bR;
-    arcAngle(Bx,By,54,Math.PI,barA,Th.beta,t4,null,0,0,2.2);
-    dash(Bx-72,By,Bx+16,By,Th.beta,t4,[6,4],1.5);
-    if(t4>.6){const k=(t4-.6)/.4;ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.beta;ctx.font='bold 17px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('β',Bx-95,By+22);ctx.font='10px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;ctx.fillText(`β = ${p.sBe}  (bar from horizontal, at B)`,Bx-95,By+38);ctx.restore()}
+    arcAngle(Bx,By,54,Math.PI,barA,Th.beta,t4,null,0,0,2.5);
+    dash(Bx-72,By,Bx+20,By,Th.beta,t4,[6,4],1.8);
+    if(t4>.45){
+      const k=(t4-.45)/.55;
+      const midA=(Math.PI+barA)/2;
+      // β symbol
+      ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.beta;
+      ctx.font='bold 22px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('β',Bx+(54+26)*Math.cos(midA),By+(54+26)*Math.sin(midA));
+      ctx.restore();
+      // annotation box below B
+      const bx2=Bx-120,by2=By+70,bw2=240,bh2=38;
+      annotBox(bx2,by2,bw2,bh2,Th.labelBoxBeta,Th.labelBoxBetaB,k);
+      ctx.save();ctx.globalAlpha=k;
+      ctx.fillStyle=Th.beta;ctx.font='bold 13px Space Mono,monospace';ctx.textBaseline='top';
+      ctx.fillText('β',bx2+10,by2+6);
+      ctx.fillStyle=dark?'#fde68a':'#92400e';ctx.font='bold 11px Space Grotesk,sans-serif';
+      ctx.fillText('= bar angle from horizontal (at B)',bx2+24,by2+6);
+      ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+      ctx.fillText(`β = ${p.sBe}`,bx2+10,by2+22);
+      ctx.restore();
+    }
   }
 
-  // α — show force direction arrow and arc at A
+  // α at A — arc + annotation box
   if(t4>0){
     const barA=Math.PI-p.bR;
     const forceA=Math.atan2(-p.uy,p.ux);
-    arcAngle(Ax,Ay,42,barA,forceA,Th.alpha,t4,null,0,0,2.2);
-    dash(Ax,Ay,Ax+48*Math.cos(barA),Ay+48*Math.sin(barA),Th.alpha,t4,[5,4],1.5);
-    arw(Ax,Ay,Ax+Math.cos(p.thetaF)*60,Ay-Math.sin(p.thetaF)*60,Th.alpha,t4,null,0,0,2);
-    if(t4>.6){const k=(t4-.6)/.4;const mid=(barA+forceA)/2;ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.alpha;ctx.font='bold 17px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',Ax+65*Math.cos(mid),Ay+65*Math.sin(mid));ctx.font='10px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;ctx.textAlign='left';ctx.fillText(`α = ${p.sAl}  (force from bar, at A)`,Ax+12,Ay+44);ctx.restore()}
+    arcAngle(Ax,Ay,42,barA,forceA,Th.alpha,t4,null,0,0,2.5);
+    dash(Ax,Ay,Ax+52*Math.cos(barA),Ay+52*Math.sin(barA),Th.alpha,t4,[5,4],1.8);
+    arw(Ax,Ay,Ax+Math.cos(p.thetaF)*65,Ay-Math.sin(p.thetaF)*65,Th.alpha,t4,null,0,0,2);
+    if(t4>.45){
+      const k=(t4-.45)/.55;
+      const mid=(barA+forceA)/2;
+      ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.alpha;
+      ctx.font='bold 22px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('α',Ax+(42+28)*Math.cos(mid),Ay+(42+28)*Math.sin(mid));
+      ctx.restore();
+      // annotation box upper-right of A
+      const bx3=Ax+55,by3=Ay-58,bw3=228,bh3=38;
+      annotBox(bx3,by3,bw3,bh3,Th.labelBoxAlpha,Th.labelBoxAlphaB,k);
+      ctx.save();ctx.globalAlpha=k;
+      ctx.fillStyle=Th.alpha;ctx.font='bold 13px Space Mono,monospace';ctx.textBaseline='top';
+      ctx.fillText('α',bx3+10,by3+6);
+      ctx.fillStyle=dark?'#6ee7b7':'#065f46';ctx.font='bold 11px Space Grotesk,sans-serif';
+      ctx.fillText('= force angle from bar (at A)',bx3+24,by3+6);
+      ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+      ctx.fillText(`α = ${p.sAl}`,bx3+10,by3+22);
+      ctx.restore();
+    }
   }
 
   // info box
@@ -898,8 +984,8 @@ function drawGeom(p,t){
       {c:Th.arm,l:`AG = ${p.vD.isNum?fmt(p.AGm,3)+'m':p.sAG}`},
       {c:Th.reaction,l:`GB = ${p.vCG.isNum?fmt(p.GBm,3)+'m':p.sGB}`},
       {c:Th.barS,l:`AB = ${p.allNum?fmt(p.ABm,3)+'m':p.sAB}`},
-      {c:Th.beta,l:`β  = ${p.sBe}  (bar ∠ horizontal)`},
-      {c:Th.alpha,l:`α  = ${p.sAl}  (force ∠ bar)`},
+      {c:Th.beta,l:`β  = ${p.sBe}  (bar ∠ horizontal, at B)`},
+      {c:Th.alpha,l:`α  = ${p.sAl}  (force ∠ bar, at A)`},
     ];
     ctx.font='700 12px Space Mono,monospace';
     rows.forEach((r,i)=>{ctx.fillStyle=r.c;ctx.fillText(r.l,bx+14,by2+25+i*18)});
@@ -930,28 +1016,43 @@ function drawMoments(p,t){
   if(t1>.5)txt((Gx+Bx)/2,Gy-14,`d_W = ${p.vCG.isNum?fmt(p.dWnum,3)+'m':p.sGB}`,Th.weight,'bold 13px Space Mono,monospace',(t1-.5)/.5,'center');
   arw(Gx,Gy,Gx,Gy+90,Th.weight,t1,p.weightLabel,Gx+9,Gy+100);
 
-  // Weight moment arc
   if(t2>0)arcAngle(Bx,By,56,-Math.PI/2,-Math.PI/2+.9,Th.weight,t2,
     `M_W=${p.allNum?fmt(p.MWnum,1)+'N·m':String(p.sMW)}`,Bx+62,By-54);
 
   // Applied force + α label
   if(t3>0){
-    const fLen=95,fx=Math.cos(p.thetaF),fy=-Math.sin(p.thetaF);
-    arw(Ax,Ay,Ax+fx*fLen,Ay+fy*fLen,Th.force,t3,p.forceLabel,Ax+fx*fLen+7,Ay+fy*fLen-7);
-    // α arc
+    const fLen=95,fx2=Math.cos(p.thetaF),fy2=-Math.sin(p.thetaF);
+    arw(Ax,Ay,Ax+fx2*fLen,Ay+fy2*fLen,Th.force,t3,p.forceLabel,Ax+fx2*fLen+7,Ay+fy2*fLen-7);
     if(t3>.4){
       const k=(t3-.4)/.6;
       const barA=Math.PI-p.bR,forceA=Math.atan2(-p.uy,p.ux);
-      arcAngle(Ax,Ay,36,barA,forceA,Th.alpha,k,null,0,0,2);
-      dash(Ax,Ay,Ax+40*Math.cos(barA),Ay+40*Math.sin(barA),Th.alpha,k,[5,4],1.5);
-      if(k>.5){const ka=(k-.5)/.5;const mid=(barA+forceA)/2;ctx.save();ctx.globalAlpha=ka;ctx.fillStyle=Th.alpha;ctx.font='bold 15px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',Ax+56*Math.cos(mid),Ay+56*Math.sin(mid));ctx.restore()}
+      arcAngle(Ax,Ay,36,barA,forceA,Th.alpha,k,null,0,0,2.5);
+      dash(Ax,Ay,Ax+44*Math.cos(barA),Ay+44*Math.sin(barA),Th.alpha,k,[5,4],1.8);
+      if(k>.4){
+        const ka=(k-.4)/.6;
+        const mid=(barA+forceA)/2;
+        ctx.save();ctx.globalAlpha=ka;ctx.fillStyle=Th.alpha;
+        ctx.font='bold 20px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('α',Ax+(36+26)*Math.cos(mid),Ay+(36+26)*Math.sin(mid));
+        ctx.restore();
+        // α annotation box
+        const bxA=Ax+58,byA=Ay-52,bwA=224,bhA=36;
+        annotBox(bxA,byA,bwA,bhA,Th.labelBoxAlpha,Th.labelBoxAlphaB,ka);
+        ctx.save();ctx.globalAlpha=ka;
+        ctx.fillStyle=Th.alpha;ctx.font='bold 12px Space Mono,monospace';ctx.textBaseline='top';
+        ctx.fillText('α',bxA+8,byA+5);
+        ctx.fillStyle=dark?'#6ee7b7':'#065f46';ctx.font='bold 11px Space Grotesk,sans-serif';
+        ctx.fillText('= force angle from bar (at A)',bxA+22,byA+5);
+        ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+        ctx.fillText(`α = ${p.sAl}`,bxA+8,byA+20);
+        ctx.restore();
+      }
     }
 
-    // Perp arm from B to force line
     if(t4>0&&p.dFnum>1e-6){
       const bax=Bx-Ax,bay=By-Ay;
-      const s2=bax*fx+bay*fy;
-      const footX=Ax+s2*fx,footY=Ay+s2*fy;
+      const s2=bax*(Math.cos(p.thetaF))+bay*(-Math.sin(p.thetaF));
+      const footX=Ax+s2*(Math.cos(p.thetaF)),footY=Ay+s2*(-Math.sin(p.thetaF));
       dash(Bx,By,footX,footY,Th.arm,t4,[5,3],2.5);
       if(t4>.5){
         const k=(t4-.5)/.5;
@@ -974,7 +1075,7 @@ function drawMoments(p,t){
   }
 
   if(t5>0){
-    const sx=CW-228,sy=14,sw=214,sh=p.symbolic?95:108;
+    const sx=CW-232,sy=14,sw=218,sh=p.symbolic?95:108;
     ctx.save();ctx.globalAlpha=t5;
     ctx.fillStyle=Th.box;ctx.strokeStyle=Th.boxB;ctx.lineWidth=1;
     ctx.beginPath();ctx.roundRect(sx,sy,sw,sh,13);ctx.fill();ctx.stroke();
