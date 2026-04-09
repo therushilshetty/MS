@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
@@ -42,19 +42,16 @@ body{
 }
 input, button{font-family:inherit;color:inherit;outline:none;border:none;background:none;}
 
-/* Header */
 .hdr{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:0 24px;height:56px;background:rgba(13,17,23,0.85);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;}
 .brand-name{font-size:15px;font-weight:700;}
 .brand-sub{font-size:10px;color:var(--muted);font-family:var(--mono);}
 
-/* Layout */
 .layout{display:grid;grid-template-columns:355px 1fr;min-height:calc(100vh - 56px)}
 .sidebar{padding:16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 .main-col{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 
-/* Input Fields */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
@@ -62,8 +59,8 @@ input, button{font-family:inherit;color:inherit;outline:none;border:none;backgro
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
 .solve-btn{width:100%;padding:12px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:white;font-weight:700;margin-top:10px;cursor:pointer}
+.errmsg{display:none;font-size:11px;color:var(--rose);background:rgba(251,113,133,0.1);border:1px solid var(--rose);padding:8px;border-radius:8px;margin-top:10px;}
 
-/* Canvas & Tabs */
 .canvas-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;position:relative}
 .fbd-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
 .tabs{display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:10px}
@@ -72,7 +69,6 @@ input, button{font-family:inherit;color:inherit;outline:none;border:none;backgro
 .canvas-zone{padding:20px;display:flex;justify-content:center;background:radial-gradient(circle at center, var(--surface3), var(--bg));}
 canvas{border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
 
-/* Results */
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chip{padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;text-align:center}
 .ck{font-size:9px;font-weight:700;color:var(--faint);margin-bottom:4px}
@@ -111,7 +107,7 @@ canvas{border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
       </div>
       <div class="field">
         <label>Mass (kg)</label>
-        <div class="iw"><input id="inp_m" value="100"></div>
+        <div class="iw"><input id="inp_mass" value="100"></div>
       </div>
       <div class="field-row">
         <div class="field">
@@ -124,6 +120,7 @@ canvas{border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
         </div>
       </div>
       <button class="solve-btn" id="solveBtn">SOLVE & ANIMATE</button>
+      <div class="errmsg" id="errMsg"></div>
     </div>
 
     <div class="card">
@@ -160,7 +157,7 @@ function getInputs() {
     h: parseFloat(document.getElementById('inp_h').value),
     ag: parseFloat(document.getElementById('inp_ag').value),
     gb: parseFloat(document.getElementById('inp_gb').value),
-    m: parseFloat(document.getElementById('inp_m').value),
+    m: parseFloat(document.getElementById('inp_mass').value),
     beta: parseFloat(document.getElementById('inp_beta').value) * Math.PI / 180,
     alpha: parseFloat(document.getElementById('inp_alpha').value) * Math.PI / 180
   };
@@ -168,20 +165,21 @@ function getInputs() {
 
 function solve() {
   const p = getInputs();
+  const err = document.getElementById('errMsg');
+  err.style.display = 'none';
+
+  if (p.h < 0 || p.ag < 0 || p.gb < 0 || p.m < 0) {
+    err.textContent = "Warning: Lengths and mass should not be negative.";
+    err.style.display = 'block';
+  }
+
   const W = p.m * 9.81;
   const L = p.ag + p.gb;
-  
-  // Moment balance about B (wheel axle)
-  // Moment due to Weight: W * gb * cos(beta) [Counter-clockwise if bar is slanted?]
-  // Actually, horizontal dist between G and B is p.gb. Weight is vertical.
   const momentW = W * p.gb;
-  
-  // Moment due to Force F: F * sin(alpha) * L
-  // F is applied at A, L is distance AB. alpha is relative to bar.
   const F = momentW / (L * Math.sin(p.alpha));
   
   document.getElementById('res_F').textContent = F.toFixed(1);
-  document.getElementById('res_B').textContent = (W - F * Math.sin(p.beta + p.alpha)).toFixed(1); // Simplified vert reaction
+  document.getElementById('res_B').textContent = (W - F * Math.sin(p.beta + p.alpha)).toFixed(1);
   
   draw(p, F);
 }
@@ -190,44 +188,35 @@ function draw(p, FVal) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const scale = 0.3;
   const offX = 550, offY = 350;
-  
   const L = (p.ag + p.gb) * scale;
   const dG = p.gb * scale;
   
-  // Points
   const B = { x: offX, y: offY };
-  const A = { 
-    x: B.x - L * Math.cos(p.beta), 
-    y: B.y - L * Math.sin(p.beta) 
-  };
-  const G = {
-    x: B.x - dG * Math.cos(p.beta),
-    y: B.y - dG * Math.sin(p.beta)
-  };
+  const A = { x: B.x - L * Math.cos(p.beta), y: B.y - L * Math.sin(p.beta) };
+  const G = { x: B.x - dG * Math.cos(p.beta), y: B.y - dG * Math.sin(p.beta) };
 
-  // 1. Draw Ground
   ctx.strokeStyle = '#4a607e';
   ctx.beginPath(); ctx.moveTo(100, offY + 20); ctx.lineTo(700, offY + 20); ctx.stroke();
 
-  // 2. Draw Bar (AB)
-  ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 6; ctx.strokeStyle = '#38bdf8';
   ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
 
-  // 3. Labels AG and GB
-  if(currentTab === 'geom') {
-    ctx.lineWidth = 1; ctx.strokeStyle = '#8ba3c9'; ctx.fillStyle = '#8ba3c9';
-    ctx.font = '10px Space Mono';
-    
-    // Dim line for AG
-    ctx.beginPath(); ctx.moveTo(A.x, A.y - 30); ctx.lineTo(G.x, G.y - 30); ctx.stroke();
-    ctx.fillText(`AG: ${p.ag}mm`, (A.x + G.x)/2 - 20, A.y - 35);
-    
-    // Dim line for GB
-    ctx.beginPath(); ctx.moveTo(G.x, G.y - 30); ctx.lineTo(B.x, B.y - 30); ctx.stroke();
-    ctx.fillText(`GB: ${p.gb}mm`, (G.x + B.x)/2 - 20, G.y - 35);
-  }
+  // Labels for FBD (GB and h)
+  ctx.lineWidth = 1; ctx.strokeStyle = '#a78bfa'; ctx.fillStyle = '#a78bfa';
+  ctx.font = '11px Space Mono';
+  
+  // Horizontal distance GB
+  ctx.beginPath();
+  ctx.moveTo(G.x, G.y + 20); ctx.lineTo(B.x, B.y + 20);
+  ctx.stroke();
+  ctx.fillText(`GB: ${p.gb}mm`, (G.x + B.x)/2 - 25, G.y + 35);
 
-  // 4. Force F (Relative to Bar)
+  // Vertical distance h
+  ctx.beginPath();
+  ctx.moveTo(A.x - 20, A.y); ctx.lineTo(A.x - 20, B.y);
+  ctx.stroke();
+  ctx.fillText(`h: ${p.h}mm`, A.x - 65, (A.y + B.y)/2);
+
   const forceAngle = p.beta + p.alpha;
   const fLen = 60;
   ctx.strokeStyle = '#34d399'; ctx.lineWidth = 3;
@@ -237,12 +226,10 @@ function draw(p, FVal) {
   ctx.stroke();
   ctx.fillStyle = '#34d399'; ctx.fillText('F', A.x - fLen * Math.cos(forceAngle) - 10, A.y - fLen * Math.sin(forceAngle) - 5);
 
-  // 5. Weight W at G
   ctx.strokeStyle = '#fb7185'; ctx.beginPath();
   ctx.moveTo(G.x, G.y); ctx.lineTo(G.x, G.y + 50); ctx.stroke();
-  ctx.fillStyle = '#fb7185'; ctx.fillText('W = mg', G.x + 5, G.y + 45);
+  ctx.fillStyle = '#fb7185'; ctx.fillText('W', G.x + 5, G.y + 45);
 
-  // 6. Wheel Axle Reaction
   ctx.strokeStyle = '#fbbf24'; ctx.beginPath();
   ctx.moveTo(B.x, B.y); ctx.lineTo(B.x, B.y - 40); ctx.stroke();
   ctx.fillStyle = '#fbbf24'; ctx.fillText('B_y', B.x + 5, B.y - 35);
@@ -258,9 +245,7 @@ document.querySelectorAll('.tab').forEach(t => {
   });
 });
 
-// Initial Solve
 solve();
 </script>
-
 </body>
 </html>
