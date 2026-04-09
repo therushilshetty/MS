@@ -1,429 +1,1046 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>StaticsMaster - Universal Wheelbarrow Moment Solver</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>StaticsMaster · Wheelbarrow Solver</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root,[data-theme="dark"]{
-  --bg:#0a1020;--surface:#121a2d;--surface2:#17223b;--surface3:#1c2946;
-  --border:rgba(175,205,255,.12);--divider:rgba(175,205,255,.08);
-  --text:#edf4ff;--muted:#98a7c7;--faint:#5f6d89;
-  --primary:#63c7ff;--primary-glow:rgba(99,199,255,.18);
-  --accent:#42e3ba;--accent-glow:rgba(66,227,186,.18);
-  --warn:#ffc85c;--warn-glow:rgba(255,200,92,.15);
-  --danger:#ff7284;--danger-glow:rgba(255,114,132,.14);
-  --purple:#9987ff;--teal:#36d3c7;
-  --shadow-sm:0 8px 24px rgba(0,0,0,.18);--shadow-md:0 20px 50px rgba(0,0,0,.24);
-  --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-xl:24px;
-  --font-body:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+:root{
+  --bg:#07090f;--surface:#0d1117;--surface2:#111827;--surface3:#162033;
+  --border:rgba(56,189,248,.13);--divider:rgba(56,189,248,.07);
+  --text:#e2eeff;--muted:#8ba3c9;--faint:#4a607e;
+  --cyan:#38bdf8;--cyan-glow:rgba(56,189,248,.18);
+  --violet:#a78bfa;--violet-glow:rgba(167,139,250,.15);
+  --orange:#fb923c;--orange-glow:rgba(251,146,60,.15);
+  --green:#34d399;--green-glow:rgba(52,211,153,.14);
+  --rose:#fb7185;--rose-glow:rgba(251,113,133,.13);
+  --yellow:#fbbf24;--yellow-glow:rgba(251,191,36,.13);
+  --grid-line:rgba(56,189,248,.04);
+  --font:'Space Grotesk',sans-serif;--mono:'Space Mono',monospace;
+  --r-sm:8px;--r-md:14px;--r-lg:20px;
 }
 [data-theme="light"]{
-  --bg:#eef4fb;--surface:#fff;--surface2:#f8fbff;--surface3:#edf4ff;
-  --border:rgba(25,50,92,.10);--divider:rgba(25,50,92,.06);
-  --text:#17233b;--muted:#617393;--faint:#9ca8bc;
-  --primary:#0f8cff;--primary-glow:rgba(15,140,255,.12);
-  --accent:#0ca881;--accent-glow:rgba(12,168,129,.12);
-  --warn:#c98b00;--warn-glow:rgba(201,139,0,.10);
-  --danger:#d94862;--danger-glow:rgba(217,72,98,.10);
-  --purple:#7068ff;--teal:#1198a9;
-  --shadow-sm:0 8px 24px rgba(18,28,45,.08);--shadow-md:0 20px 50px rgba(18,28,45,.12);
+  --bg:#f0f4fa;--surface:#fff;--surface2:#f5f9ff;--surface3:#eaf2ff;
+  --border:rgba(14,80,180,.10);--divider:rgba(14,80,180,.06);
+  --text:#0f172a;--muted:#4b6b96;--faint:#94a3b8;
+  --cyan:#0284c7;--cyan-glow:rgba(2,132,199,.10);
+  --violet:#7c3aed;--violet-glow:rgba(124,58,237,.10);
+  --orange:#ea580c;--orange-glow:rgba(234,88,12,.10);
+  --green:#059669;--green-glow:rgba(5,150,105,.10);
+  --rose:#e11d48;--rose-glow:rgba(225,29,72,.10);
+  --yellow:#d97706;--yellow-glow:rgba(217,119,6,.10);
+  --grid-line:rgba(14,80,180,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-body{font-family:var(--font-body);background:radial-gradient(circle at top, color-mix(in srgb, var(--primary-glow) 55%, transparent), transparent 28%),var(--bg);color:var(--text);min-height:100vh}
-button,input{font:inherit;color:inherit}
-button{border:none;background:none;cursor:pointer}
-input{outline:none}
-.header{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 90%, var(--primary) 10%),var(--surface));backdrop-filter:blur(12px)}
-.brand{display:flex;align-items:center;gap:12px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--primary),var(--purple));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:var(--shadow-sm)}
-.brand h1{font-size:15px;font-weight:700}.brand p{font-size:11px;color:var(--muted)}
-.header-actions{display:flex;gap:10px;align-items:center}.badge{padding:6px 10px;border-radius:999px;background:var(--primary-glow);color:var(--primary);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}.theme-toggle{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);display:grid;place-items:center}
-.layout{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 69px)}
-.sidebar{padding:20px;border-right:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%, transparent);display:flex;flex-direction:column;gap:18px}
-.main{padding:22px;display:flex;flex-direction:column;gap:20px}
-.card{background:linear-gradient(180deg,color-mix(in srgb,var(--surface2) 95%, white 5%),var(--surface2));border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
-.card-pad{padding:18px}.card-head{display:flex;gap:10px;align-items:center;margin-bottom:14px}.icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px}.i-blue{background:var(--primary-glow);color:var(--primary)}.i-green{background:var(--accent-glow);color:var(--accent)}.i-warn{background:var(--warn-glow);color:var(--warn)}.i-purple{background:rgba(153,135,255,.14);color:var(--purple)}.i-error{background:var(--danger-glow);color:var(--danger)}
-.card-title{font-size:13px;font-weight:700}.card-sub{font-size:11px;color:var(--muted)}
-.section-label{font-size:10px;font-weight:800;color:var(--faint);letter-spacing:.8px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--divider);margin:14px 0 12px}
-.field{margin-bottom:12px}.field label{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px}.unit{font-size:10px;color:var(--faint);background:var(--surface3);padding:2px 7px;border:1px solid var(--border);border-radius:999px;text-transform:none}
-.input-wrap{position:relative}.input-wrap input{width:100%;padding:10px 12px;background:var(--surface3);border:1px solid var(--border);border-radius:12px}.input-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-glow)}.input-wrap input.error{border-color:var(--danger);box-shadow:0 0 0 4px var(--danger-glow)}
-.solve-btn{width:100%;padding:13px 16px;border-radius:14px;color:#fff;font-weight:800;letter-spacing:.2px;background:linear-gradient(135deg,var(--teal),var(--primary),var(--purple));box-shadow:var(--shadow-sm);transform:translateY(0);transition:.25s ease}
-.solve-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
-.solve-btn:disabled{opacity:.5;transform:none;cursor:not-allowed}
-.help{font-size:11px;color:var(--muted);line-height:1.6;background:var(--surface3);border:1px solid var(--border);padding:10px 12px;border-radius:12px}
-.error-msg{font-size:11px;color:var(--danger);line-height:1.6;background:var(--surface3);border:1px solid var(--danger);padding:10px 12px;border-radius:12px;margin-top:8px;display:none}
-.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chip{padding:12px;border-radius:14px;background:var(--surface3);border:1px solid var(--border);text-align:center;position:relative;overflow:hidden}.chip:before{content:'';position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--primary),var(--purple))}.chip .k{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}.chip .v{font-family:var(--font-mono);font-size:20px;font-weight:700}.chip .u{font-size:11px;color:var(--muted)}.chip.answer{grid-column:1/-1;border-color:rgba(99,199,255,.34);background:linear-gradient(135deg,rgba(99,199,255,.08),rgba(153,135,255,.08))}.chip.answer .v{font-size:28px;color:var(--primary)}
-.fbd-wrap{overflow:hidden}.fbd-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border)}.tabs{display:flex;gap:4px;background:var(--surface3);padding:4px;border-radius:12px}.tab{padding:7px 12px;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);transition:.25s ease}.tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-.canvas-zone{position:relative;padding:20px;min-height:470px;display:grid;place-items:center;background:radial-gradient(circle at top, color-mix(in srgb,var(--primary-glow) 55%, transparent), transparent 35%)}
-canvas{max-width:100%;height:auto;display:block;border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 88%, white 12%),var(--surface));box-shadow:var(--shadow-md);opacity:1;transform:translateY(0) scale(1);transition:opacity .35s ease,transform .45s cubic-bezier(.16,1,.3,1),filter .35s ease}
-canvas.switching{opacity:.08;transform:translateY(8px) scale(.985);filter:blur(1.5px) saturate(.92)}
-.build-badge{position:absolute;right:30px;bottom:28px;padding:8px 12px;border-radius:999px;background:color-mix(in srgb,var(--surface3) 85%, black 15%);border:1px solid var(--border);display:none;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.35px;backdrop-filter:blur(10px)}.build-badge.active{display:flex}.dot{width:8px;height:8px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 0 var(--accent-glow);animation:ping 1.2s infinite}
-@keyframes ping{0%{transform:scale(1);box-shadow:0 0 0 0 var(--accent-glow)}70%{transform:scale(1.12);box-shadow:0 0 0 8px transparent}100%{transform:scale(1)}}
-.steps{display:flex;flex-direction:column}.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--divider)}.step:last-child{border-bottom:none}.n{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:var(--surface3);border:1px solid var(--border);font:700 11px var(--font-mono);color:var(--muted)}.step.active .n{background:var(--primary);border-color:var(--primary);color:white}.st{font-size:13px;font-weight:700;margin-bottom:4px}.sd{font-size:12px;color:var(--muted);line-height:1.55}.math{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--surface3);border-left:3px solid var(--primary);font:12px var(--font-mono);color:var(--primary);line-height:1.7;overflow:auto}
-.eq{padding:15px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(99,199,255,.08),rgba(153,135,255,.08));border:1px solid rgba(99,199,255,.22);font:13px var(--font-mono);line-height:1.8}
-.notice{padding:12px;border-radius:12px;background:var(--surface3);border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6}
-@media(max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:40px 40px;
+  color:var(--text);min-height:100vh;
+}
+button,input{font-family:var(--font);color:var(--text);border:none;outline:none;background:none;cursor:pointer}
+
+.hdr{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:0 24px;height:56px;background:color-mix(in srgb,var(--surface) 85%,transparent);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;box-shadow:0 0 20px var(--cyan-glow)}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.brand-sub{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:.4px}
+.hdr-r{display:flex;gap:8px;align-items:center}
+.pill{padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--border);color:var(--cyan);background:var(--cyan-glow)}
+.sym-pill{color:var(--violet);background:var(--violet-glow);border-color:rgba(167,139,250,.25)}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{border-color:var(--cyan);background:var(--cyan-glow)}
+
+.layout{display:grid;grid-template-columns:355px 1fr;min-height:calc(100vh - 56px)}
+.sidebar{padding:16px;border-right:1px solid var(--border);background:color-mix(in srgb,var(--surface) 70%,transparent);display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.main-col{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.card-pad{padding:16px}
+.card-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.ibox{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.ib-cyan{background:var(--cyan-glow);color:var(--cyan);border:1px solid rgba(56,189,248,.25)}
+.ib-violet{background:var(--violet-glow);color:var(--violet);border:1px solid rgba(167,139,250,.25)}
+.ib-orange{background:var(--orange-glow);color:var(--orange);border:1px solid rgba(251,146,60,.25)}
+.ib-green{background:var(--green-glow);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.ct{font-size:12px;font-weight:700}.cs{font-size:10px;color:var(--muted);margin-top:1px}
+
+.slabel{font-size:9px;font-weight:700;font-family:var(--mono);color:var(--faint);letter-spacing:1px;text-transform:uppercase;padding:8px 0 6px;border-bottom:1px solid var(--divider);margin:4px 0 8px}
+
+.field{margin-bottom:8px}
+.field label{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.utag{font-size:9px;font-family:var(--mono);text-transform:none;letter-spacing:0;font-weight:400;padding:1px 6px;border-radius:999px}
+.utag-c{color:var(--cyan);background:var(--cyan-glow);border:1px solid rgba(56,189,248,.2)}
+.utag-v{color:var(--violet);background:var(--violet-glow);border:1px solid rgba(167,139,250,.2)}
+.utag-o{color:var(--orange);background:var(--orange-glow);border:1px solid rgba(251,146,60,.2)}
+.utag-g{color:var(--green);background:var(--green-glow);border:1px solid rgba(52,211,153,.2)}
+.utag-y{color:var(--yellow);background:var(--yellow-glow);border:1px solid rgba(251,191,36,.2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.iw input{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;font-size:12px;transition:.2s;color:var(--text)}
+.iw input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow)}
+.iw input.sym{border-color:rgba(167,139,250,.5);color:var(--violet);font-family:var(--mono);background:rgba(167,139,250,.05)}
+.iw input.err{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-glow)}
+
+/* ─ ANGLE HINT CARDS ─ */
+.angle-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.a-card{padding:10px 8px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);text-align:center}
+.a-card svg{display:block;margin:0 auto 5px}
+.a-name{font-weight:700;font-family:var(--mono);font-size:12px;margin-bottom:3px}
+.a-desc{color:var(--muted);font-size:9px;line-height:1.5}
+
+.solve-btn{width:100%;padding:11px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--violet),var(--orange));box-shadow:0 4px 20px rgba(56,189,248,.2);transition:.25s;position:relative;overflow:hidden}
+.solve-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.13),transparent);transform:translateX(-100%);transition:.5s}
+.solve-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(56,189,248,.3)}
+.solve-btn:hover::after{transform:translateX(100%)}
+
+.sym-banner{display:none;padding:9px 12px;border-radius:10px;background:var(--violet-glow);border:1px solid rgba(167,139,250,.3);font-size:11px;color:var(--violet);line-height:1.6;margin-top:8px}
+.sym-banner.on{display:block}
+.errmsg{display:none;font-size:11px;color:var(--rose);background:var(--rose-glow);border:1px solid rgba(251,113,133,.25);padding:8px 11px;border-radius:9px;margin-top:8px;line-height:1.6}
+.help{font-size:10px;color:var(--muted);line-height:1.7;background:var(--surface2);border:1px solid var(--border);padding:9px 11px;border-radius:9px;margin-top:8px}
+.help b{color:var(--cyan)}
+
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.chip{padding:10px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);text-align:center;position:relative;overflow:hidden;transition:.25s}
+.chip:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.chip-acc{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.ck{font-size:9px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.cv{font-family:var(--mono);font-size:17px;font-weight:700;line-height:1;word-break:break-all}
+.cv.sym-val{font-size:11px;color:var(--violet)}
+.cu{font-size:9px;color:var(--muted);margin-top:2px}
+.chip.big{grid-column:1/-1;background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.06));border-color:rgba(56,189,248,.3)}
+.chip.big .cv{font-size:22px;color:var(--cyan)}
+.chip.big .cv.sym-val{font-size:12px;color:var(--violet)}
+.chip.big .chip-acc{background:linear-gradient(90deg,var(--cyan),var(--violet),var(--orange))}
+
+.fbd-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+.tabs{display:flex;gap:3px;background:var(--surface2);padding:3px;border-radius:10px}
+.tab{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;color:var(--muted);transition:.2s}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.canvas-zone{position:relative;background:radial-gradient(ellipse at 30% 40%,color-mix(in srgb,var(--cyan-glow) 60%,transparent),transparent 55%),radial-gradient(ellipse at 70% 70%,color-mix(in srgb,var(--violet-glow) 40%,transparent),transparent 50%),var(--bg);display:grid;place-items:center;padding:14px}
+#fbdCanvas{border-radius:12px;max-width:100%;display:block;transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1);box-shadow:0 8px 40px rgba(0,0,0,.55)}
+#fbdCanvas.switching{opacity:.05;transform:scale(.97)}
+.status{position:absolute;right:22px;bottom:20px;display:none;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid var(--border);background:color-mix(in srgb,var(--surface) 80%,transparent);backdrop-filter:blur(8px)}
+.status.on{display:flex}
+.dot{width:6px;height:6px;border-radius:999px;background:var(--green);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--divider)}
+.step:last-child{border:none}
+.snum{width:24px;height:24px;border-radius:999px;flex-shrink:0;display:grid;place-items:center;font:700 10px var(--mono);color:var(--muted);background:var(--surface2);border:1px solid var(--border)}
+.step.done .snum{background:var(--cyan);border-color:var(--cyan);color:#07090f}
+.step.sym .snum{background:var(--violet);border-color:var(--violet);color:#fff}
+.stitle{font-size:12px;font-weight:700;margin-bottom:2px}
+.sdesc{font-size:11px;color:var(--muted);line-height:1.6}
+.math{margin-top:5px;padding:6px 10px;border-radius:7px;background:var(--surface2);border-left:3px solid var(--cyan);font:11px var(--mono);color:var(--cyan);line-height:1.9}
+.math.sm{border-left-color:var(--violet);color:var(--violet)}
+
+.eqbox{padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(56,189,248,.05),rgba(167,139,250,.05));border:1px solid rgba(56,189,248,.2);font:13px/1.9 var(--mono);word-break:break-all}
+
+.case-banner{padding:9px 12px;border-radius:9px;font-size:11px;line-height:1.6;margin-bottom:10px}
+.cb-warn{background:var(--orange-glow);border:1px solid rgba(251,146,60,.3);color:var(--orange)}
+.cb-info{background:var(--cyan-glow);border:1px solid rgba(56,189,248,.3);color:var(--cyan)}
+.cb-sym{background:var(--violet-glow);border:1px solid rgba(167,139,250,.3);color:var(--violet)}
+
+.notice{padding:12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.7}
+
+@media(max-width:960px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
-<header class="header">
+
+<header class="hdr">
   <div class="brand">
     <div class="logo">SM</div>
     <div>
-      <h1>StaticsMaster</h1>
-      <p>Universal Wheelbarrow Solver · Professor-Proof</p>
+      <div class="brand-name">StaticsMaster</div>
+      <div class="brand-sub">WHEELBARROW · ΣM = 0 · NUMERIC + SYMBOLIC</div>
     </div>
   </div>
-  <div class="header-actions">
-    <div class="badge">Engineering Mechanics</div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+  <div class="hdr-r">
+    <div class="pill">Statics</div>
+    <div class="pill sym-pill" id="modeTag">NUMERIC</div>
+    <button class="icon-btn" id="themeBtn" title="Toggle theme">
+      <svg id="themeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+    </button>
   </div>
 </header>
 
 <div class="layout">
-  <aside class="sidebar">
-    <div class="card card-pad">
-      <div class="card-head">
-        <div class="icon i-blue">📐</div>
-        <div>
-          <div class="card-title">Universal Inputs</div>
-          <div class="card-sub">Any numbers, symbols, ANY professor question</div>
-        </div>
-      </div>
-
-      <div class="section-label">Physical dimensions (mm)</div>
-      <div class="field"><label>Handle height <span class="unit">h</span></label><div class="input-wrap"><input id="inp_h" value="650"></div></div>
-      <div class="field"><label>Horizontal A→G <span class="unit">d_AG</span></label><div class="input-wrap"><input id="inp_d" value="925"></div></div>
-      <div class="field"><label>Horizontal G→B <span class="unit">d_GB</span></label><div class="input-wrap"><input id="inp_cg" value="200"></div></div>
-      
-      <div class="section-label">Angles (degrees)</div>
-      <div class="field"><label>Force angle α <span class="unit">deg</span></label><div class="input-wrap"><input id="inp_alpha" value="60"></div></div>
-      <div class="field"><label>Bar angle β <span class="unit">deg</span></label><div class="input-wrap"><input id="inp_beta" value="20"></div></div>
-      
-      <div class="section-label">Load parameters</div>
-      <div class="field"><label>Mass <span class="unit">m (kg)</span></label><div class="input-wrap"><input id="inp_mass" value="85"></div></div>
-      <div class="field"><label>Gravity <span class="unit">g (m/s²)</span></label><div class="input-wrap"><input id="inp_g" value="9.81"></div></div>
-
-      <div class="section-label">Custom labels (ANY text/symbols)</div>
-      <div class="field"><label>Applied force <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_force" value="F"></div></div>
-      <div class="field"><label>Weight <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_weight" value="mg"></div></div>
-      <div class="field"><label>Reaction <span class="unit">text</span></label><div class="input-wrap"><input id="lbl_reaction" value="R_B"></div></div>
-      <div class="field"><label>Solution symbol <span class="unit">$#@ etc</span></label><div class="input-wrap"><input id="lbl_output" value="F"></div></div>
-
-      <button class="solve-btn" id="solveBtn">Solve & Animate</button>
-      <div class="error-msg" id="errorMsg"></div>
-      <div class="help" style="margin-top:12px">
-        ✅ ANY symbols/characters work in label fields<br>
-        ⚠️ Numbers must be valid for physics calculations<br>
-        🔄 Zero/negative values show physical explanations
+<aside class="sidebar">
+  <div class="card card-pad">
+    <div class="card-head">
+      <div class="ibox ib-cyan">📐</div>
+      <div>
+        <div class="ct">Inputs — Numbers OR Any Symbol</div>
+        <div class="cs">Type 85, or m, or $, or anything. Symbolic → formula output.</div>
       </div>
     </div>
 
-    <div class="card card-pad" id="resultCard" style="display:none">
-      <div class="card-head">
-        <div class="icon i-green">✅</div>
-        <div><div class="card-title">Results</div><div class="card-sub">Moment equilibrium about B</div></div>
+    <div class="slabel">Geometry</div>
+    <div class="field">
+      <label>Handle height <span class="utag utag-c">h (mm) or any symbol</span></label>
+      <div class="iw"><input id="inp_h" value="650" placeholder="650  or  h  or  H_1  or  $"></div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>A→G horizontal <span class="utag utag-c">mm/sym</span></label>
+        <div class="iw"><input id="inp_d" value="925" placeholder="925 or a"></div>
       </div>
-      <div class="result-grid">
-        <div class="chip"><div class="k">Weight</div><div class="v" id="res_W">—</div><div class="u">N</div></div>
-        <div class="chip"><div class="k">Moment arm of force</div><div class="v" id="res_dF">—</div><div class="u">m</div></div>
-        <div class="chip"><div class="k">Moment arm of weight</div><div class="v" id="res_dW">—</div><div class="u">m</div></div>
-        <div class="chip"><div class="k">Weight moment</div><div class="v" id="res_Mw">—</div><div class="u">N·m</div></div>
-        <div class="chip answer"><div class="k">Required force</div><div class="v" id="res_F">—</div><div class="u" id="res_symbol">F (N)</div></div>
+      <div class="field">
+        <label>G→B horizontal <span class="utag utag-c">mm/sym</span></label>
+        <div class="iw"><input id="inp_cg" value="200" placeholder="200 or b"></div>
       </div>
     </div>
-  </aside>
 
-  <main class="main">
-    <section class="card fbd-wrap">
-      <div class="fbd-header">
-        <div>
-          <div class="card-title">Animated Free Body Diagram</div>
-          <div class="card-sub">Handles ALL edge cases + custom labels</div>
-        </div>
-        <div class="tabs">
-          <button class="tab active" data-tab="fbd">Full FBD</button>
-          <button class="tab" data-tab="geom">Geometry</button>
-          <button class="tab" data-tab="moment">Moments</button>
-        </div>
+    <!-- ANGLE VISUAL LEGEND -->
+    <div class="slabel">Angles — what α and β mean</div>
+    <div class="angle-hint">
+      <div class="a-card">
+        <svg width="80" height="58" viewBox="0 0 80 58">
+          <!-- ground -->
+          <line x1="4" y1="44" x2="76" y2="44" stroke="#4a607e" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="4" y="54" fill="#4a607e" font-size="7" font-family="Space Grotesk">horizontal</text>
+          <!-- bar -->
+          <line x1="62" y1="44" x2="22" y2="18" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="16" y="15" fill="#38bdf8" font-size="9" font-family="Space Mono">A</text>
+          <text x="64" y="52" fill="#38bdf8" font-size="9" font-family="Space Mono">B</text>
+          <!-- β arc at B -->
+          <path d="M 50,44 A 12,12 0 0,0 53,36.5" fill="none" stroke="#fbbf24" stroke-width="2"/>
+          <text x="37" y="42" fill="#fbbf24" font-size="11" font-family="Space Mono" font-weight="700">β</text>
+        </svg>
+        <div class="a-name" style="color:var(--yellow)">β — Bar angle</div>
+        <div class="a-desc">Angle of the bar from <em>horizontal</em>, at wheel B</div>
       </div>
-      <div class="canvas-zone">
-        <canvas id="fbdCanvas" width="860" height="480"></canvas>
-        <div class="build-badge" id="buildBadge"><span class="dot"></span><span id="buildText">Ready...</span></div>
+      <div class="a-card">
+        <svg width="80" height="58" viewBox="0 0 80 58">
+          <!-- bar (dashed reference) -->
+          <line x1="10" y1="46" x2="50" y2="20" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="48" y="17" fill="#38bdf8" font-size="7" font-family="Space Mono">bar</text>
+          <!-- force arrow -->
+          <line x1="10" y1="46" x2="62" y2="26" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="62,26 54,25 57,33" fill="#34d399"/>
+          <text x="64" y="28" fill="#34d399" font-size="9" font-family="Space Mono">F</text>
+          <!-- α arc -->
+          <path d="M 26,37 A 18,18 0 0,1 33,28" fill="none" stroke="#34d399" stroke-width="2"/>
+          <text x="34" y="42" fill="#34d399" font-size="11" font-family="Space Mono" font-weight="700">α</text>
+          <text x="6" y="56" fill="#38bdf8" font-size="9" font-family="Space Mono">A</text>
+        </svg>
+        <div class="a-name" style="color:var(--green)">α — Force angle</div>
+        <div class="a-desc">Angle of force F above the <em>bar</em>, at handle A</div>
       </div>
-    </section>
+    </div>
 
-    <section class="card card-pad">
-      <div class="card-head">
-        <div class="icon i-warn">📝</div>
-        <div><div class="card-title">Step-by-Step Solution</div><div class="card-sub">Works with edge cases & custom symbols</div></div>
+    <div class="field-row">
+      <div class="field">
+        <label>β — Bar angle <span class="utag utag-y">deg / sym</span></label>
+        <div class="iw"><input id="inp_beta" value="20" placeholder="20 or β or theta"></div>
       </div>
-      <div id="stepsWrap" class="notice">Enter ANY values and click <strong>Solve & Animate</strong></div>
-    </section>
+      <div class="field">
+        <label>α — Force angle <span class="utag utag-g">deg / sym</span></label>
+        <div class="iw"><input id="inp_alpha" value="60" placeholder="60 or α or phi"></div>
+      </div>
+    </div>
 
-    <section class="card card-pad">
-      <div class="card-head">
-        <div class="icon i-purple">∑</div>
-        <div><div class="card-title">Equilibrium Equation</div><div class="card-sub">ΣM_B = 0 (custom symbols)</div></div>
+    <div class="slabel">Load</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Mass <span class="utag utag-v">kg / sym</span></label>
+        <div class="iw"><input id="inp_mass" value="85" placeholder="85 or m or M"></div>
       </div>
-      <div class="eq" id="eqBox">ΣM_B = 0<br>F · d_F = W · d_W</div>
-    </section>
-  </main>
+      <div class="field">
+        <label>Gravity <span class="utag utag-v">m/s² / sym</span></label>
+        <div class="iw"><input id="inp_g" value="9.81" placeholder="9.81 or g or G"></div>
+      </div>
+    </div>
+
+    <div class="slabel">Output Labels (any text / symbols)</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Applied force</label>
+        <div class="iw"><input id="lbl_force" value="F"></div>
+      </div>
+      <div class="field">
+        <label>Weight</label>
+        <div class="iw"><input id="lbl_weight" value="mg"></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Reaction</label>
+        <div class="iw"><input id="lbl_reaction" value="R_B"></div>
+      </div>
+      <div class="field">
+        <label>Output symbol</label>
+        <div class="iw"><input id="lbl_output" value="F"></div>
+      </div>
+    </div>
+
+    <button class="solve-btn" id="solveBtn">⚡ Solve &amp; Animate</button>
+    <div class="errmsg" id="errMsg"></div>
+    <div class="sym-banner" id="symBanner">🔣 <strong>Symbolic mode</strong> — one or more inputs are symbols. General formula is shown. FBD draws with fallback proportions.</div>
+    <div class="help">
+      <b>Every field takes numbers OR symbols:</b><br>
+      · Numeric: <code style="color:var(--cyan)">650</code>, <code style="color:var(--cyan)">9.81</code>, <code style="color:var(--cyan)">0</code>, <code style="color:var(--cyan)">-5</code><br>
+      · Symbolic: <code style="color:var(--violet)">h</code>, <code style="color:var(--violet)">m</code>, <code style="color:var(--violet)">g</code>, <code style="color:var(--violet)">$</code>, <code style="color:var(--violet)">L₁</code>, anything<br>
+      · Mix them → substituted formula output<br>
+      · β = bar angle from horizontal &nbsp;·&nbsp; α = force angle from bar
+    </div>
+  </div>
+
+  <div class="card card-pad" id="resultCard" style="display:none">
+    <div class="card-head">
+      <div class="ibox ib-green">✓</div>
+      <div><div class="ct">Results</div><div class="cs">Moment equilibrium about B</div></div>
+    </div>
+    <div id="caseBanner" style="display:none"></div>
+    <div class="rg">
+      <div class="chip"><div class="chip-acc"></div><div class="ck">Weight W</div><div class="cv" id="r_W">—</div><div class="cu">N</div></div>
+      <div class="chip"><div class="chip-acc"></div><div class="ck">d_F (force arm)</div><div class="cv" id="r_dF">—</div><div class="cu">m</div></div>
+      <div class="chip"><div class="chip-acc"></div><div class="ck">d_W (weight arm)</div><div class="cv" id="r_dW">—</div><div class="cu">m</div></div>
+      <div class="chip"><div class="chip-acc"></div><div class="ck">Weight moment</div><div class="cv" id="r_Mw">—</div><div class="cu">N·m</div></div>
+      <div class="chip big"><div class="chip-acc"></div><div class="ck" id="r_sym">F</div><div class="cv" id="r_F">—</div><div class="cu" id="r_unit">N</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main-col">
+
+  <section class="card">
+    <div class="fbd-header">
+      <div>
+        <div class="ct">Free Body Diagram — α &amp; β clearly marked</div>
+        <div class="cs">Animated · Symbolic + Numeric · All edge cases handled</div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="fbd">Full FBD</button>
+        <button class="tab" data-tab="geom">Geometry</button>
+        <button class="tab" data-tab="moments">Moments</button>
+      </div>
+    </div>
+    <div class="canvas-zone" style="min-height:540px">
+      <canvas id="fbdCanvas" width="940" height="540"></canvas>
+      <div class="status" id="statusBadge"><span class="dot"></span><span id="statusTxt">Drawing…</span></div>
+    </div>
+  </section>
+
+  <section class="card card-pad">
+    <div class="card-head">
+      <div class="ibox ib-orange">📝</div>
+      <div><div class="ct">Step-by-Step Solution</div><div class="cs">Works with numbers and symbols</div></div>
+    </div>
+    <div id="stepsWrap" class="notice">Enter values above and click <strong>⚡ Solve &amp; Animate</strong></div>
+  </section>
+
+  <section class="card card-pad">
+    <div class="card-head">
+      <div class="ibox ib-violet">∑</div>
+      <div><div class="ct">Equilibrium Equation</div><div class="cs">ΣM_B = 0</div></div>
+    </div>
+    <div class="eqbox" id="eqBox">ΣM_B = 0 → F · d_F = W · d_W</div>
+  </section>
+
+</main>
 </div>
 
 <script>
+/* ══ THEME ══ */
 const root=document.documentElement;
-const themeToggle=document.getElementById('themeToggle');
-const errorMsg=document.getElementById('errorMsg');
-const solveBtn=document.getElementById('solveBtn');
-
-function paintThemeIcon(){
-  const dark=root.getAttribute('data-theme')!=='light';
-  themeToggle.innerHTML = dark
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+let dark=true;
+function setIcon(){
+  document.getElementById('themeIcon').innerHTML=dark
+    ?'<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+    :'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
 }
-paintThemeIcon();
-themeToggle.addEventListener('click',()=>{root.setAttribute('data-theme',root.getAttribute('data-theme')==='light'?'dark':'light');paintThemeIcon(); if(window.lastParams) animateRedraw(window.lastParams,window.activeTab||'fbd',true); else drawPlaceholder();});
+setIcon();
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  dark=!dark;root.setAttribute('data-theme',dark?'dark':'light');setIcon();
+  if(window._P)animateTab(window._P,window._tab||'fbd',true);else drawPlaceholder();
+});
 
-const canvas=document.getElementById('fbdCanvas');
-const ctx=canvas.getContext('2d');
-const buildBadge=document.getElementById('buildBadge');
-window.activeTab='fbd';
-window.animFrame=0;
-window.lastParams=null;
-
-function clearErrors(){
-  document.querySelectorAll('.input-wrap input').forEach(el=>el.classList.remove('error'));
-  errorMsg.style.display='none'; errorMsg.textContent='';
-  solveBtn.disabled=false; solveBtn.style.opacity=1;
-}
-
-function showError(fieldId, message){
-  clearErrors();
-  const field=document.getElementById(fieldId);
-  if(field) field.classList.add('error');
-  errorMsg.textContent=message;
-  errorMsg.style.display='block';
-  solveBtn.disabled=true;
-  solveBtn.style.opacity='.5';
+function TH(){
+  return dark?{
+    bg:'#07090f',cvs:'#0d1117',text:'#e2eeff',muted:'#8ba3c9',faint:'#4a607e',
+    barS:'#38bdf8',bar:'#1e3a5f',ground:'#1e293b',gndL:'#334155',
+    wheel:'#1e3a5f',wheelR:'#38bdf8',
+    force:'#34d399',weight:'#fb7185',reaction:'#fbbf24',
+    dim:'#a78bfa',arm:'#fb923c',pt:'#38bdf8',
+    alpha:'#34d399',beta:'#fbbf24',
+    grid:'rgba(56,189,248,.04)',
+    box:'rgba(13,17,23,.9)',boxB:'rgba(56,189,248,.28)',
+  }:{
+    bg:'#f0f4fa',cvs:'#ffffff',text:'#0f172a',muted:'#4b6b96',faint:'#94a3b8',
+    barS:'#0284c7',bar:'#bfdbfe',ground:'#e2e8f0',gndL:'#94a3b8',
+    wheel:'#dbeafe',wheelR:'#0284c7',
+    force:'#059669',weight:'#e11d48',reaction:'#d97706',
+    dim:'#7c3aed',arm:'#ea580c',pt:'#0284c7',
+    alpha:'#059669',beta:'#d97706',
+    grid:'rgba(14,80,180,.04)',
+    box:'rgba(255,255,255,.93)',boxB:'rgba(14,80,180,.25)',
+  };
 }
 
-function safeText(v,fallback){
-  return ((v??'').toString()||fallback).trim().substring(0,20);
+/* ══ PARSE — accept ANYTHING non-empty ══ */
+function parseV(id){
+  const raw=(document.getElementById(id).value||'').trim();
+  if(!raw)return null;
+  const n=parseFloat(raw);
+  if(!isNaN(n))return{isNum:true,num:n,str:raw};
+  return{isNum:false,num:null,str:raw};
+}
+function num(v,fb=1){return(v&&v.isNum)?v.num:fb;}
+function str(v,fb='?'){return v?v.str:fb;}
+function isN(v){return v&&v.isNum;}
+
+/* ══ SYMBOLIC ALGEBRA ══ */
+function fmtN(v,d=3){if(!isFinite(v))return '∞';return Number(v).toFixed(d).replace(/\.?0+$/,'');}
+function smul(a,b){
+  if(typeof a==='number'&&typeof b==='number')return a*b;
+  if(a===0||b===0)return 0;if(a===1)return b;if(b===1)return a;
+  const as=typeof a==='number'?fmtN(a):a;
+  const bs=typeof b==='number'?fmtN(b):b;
+  return `${as}·${bs}`;
+}
+function sadd(a,b){
+  if(typeof a==='number'&&typeof b==='number')return a+b;
+  if(a===0)return b;if(b===0)return a;
+  return `(${typeof a==='number'?fmtN(a):a} + ${typeof b==='number'?fmtN(b):b})`;
+}
+function sdiv(a,b){
+  if(typeof a==='number'&&typeof b==='number')return b!==0?a/b:Infinity;
+  if(a===0)return 0;
+  return `(${typeof a==='number'?fmtN(a):a}) / (${typeof b==='number'?fmtN(b):b})`;
 }
 
-function parseNumberGraceful(id,name,allowZero=false){
-  const raw=document.getElementById(id).value.trim();
-  const val=parseFloat(raw);
-  
-  if(raw==='' || isNaN(val)){
-    throw new Error(`${name} must be a valid number`);
-  }
-  
-  if(!allowZero && val<=0){
-    return {valid:false, message:`${name} must be positive (${raw} ≤ 0)`};
-  }
-  
-  if(val === 0 && allowZero){
-    return {valid:true, value:0, isZero:true};
-  }
-  
-  return {valid:true, value:val};
-}
+/* ══ COMPUTE ══ */
+function compute(){
+  const vH=parseV('inp_h'),vD=parseV('inp_d'),vCG=parseV('inp_cg');
+  const vA=parseV('inp_alpha'),vB=parseV('inp_beta');
+  const vM=parseV('inp_mass'),vG=parseV('inp_g');
+  if([vH,vD,vCG,vA,vB,vM,vG].some(v=>!v))return null;
 
-function validateInputs(){
-  const checks=[
-    {id:'inp_h', name:'Handle height', allowZero:false},
-    {id:'inp_d', name:'Horizontal A→G', allowZero:false},
-    {id:'inp_cg', name:'Horizontal G→B', allowZero:true},
-    {id:'inp_alpha', name:'Force angle', allowZero:true},
-    {id:'inp_beta', name:'Bar angle', allowZero:true},
-    {id:'inp_mass', name:'Mass', allowZero:false},
-    {id:'inp_g', name:'Gravity', allowZero:false}
-  ];
-  
-  for(let check of checks){
-    const result=parseNumberGraceful(check.id, check.name, check.allowZero);
-    if(!result.valid){
-      showError(check.id, result.message);
-      return false;
+  const allNum=[vH,vD,vCG,vA,vB,vM,vG].every(v=>v.isNum);
+
+  // Drawing values (use fallback for symbolic)
+  const Hmm=num(vH,650),AGmm=num(vD,925),GBmm=num(vCG,200);
+  const alphaD=num(vA,60),betaD=num(vB,20);
+  const massN=num(vM,85),gN=num(vG,9.81);
+  const Hm=Hmm/1000,AGm=AGmm/1000,GBm=GBmm/1000,ABm=AGm+GBm;
+  const aR=alphaD*Math.PI/180,bR=betaD*Math.PI/180;
+  const thetaF=Math.PI-bR-aR;
+  const ux=Math.cos(thetaF),uy=Math.sin(thetaF);
+  const Wnum=massN*gN;
+  const dFnum=Math.abs((-ABm)*uy-(Hm)*ux);
+  const dWnum=Math.abs(GBm);
+  const MWnum=Wnum*dWnum;
+  const Fnum=allNum?(dFnum>1e-9?MWnum/dFnum:Infinity):null;
+
+  // Symbolic strings
+  const sH=isN(vH)?fmtN(Hm,3):str(vH);
+  const sAG=isN(vD)?fmtN(AGm,3):str(vD);
+  const sGB=isN(vCG)?fmtN(GBm,3):str(vCG);
+  const sAl=isN(vA)?`${alphaD}°`:str(vA);
+  const sBe=isN(vB)?`${betaD}°`:str(vB);
+  const sAB=sadd(isN(vD)?AGm:str(vD),isN(vCG)?GBm:str(vCG));
+  const sW=smul(isN(vM)?massN:str(vM),isN(vG)?gN:str(vG));
+  const angPair=`(${sAl}+${sBe})`;
+  const cosV=isN(vA)&&isN(vB)?fmtN(Math.cos(aR+bR),4):`cos${angPair}`;
+  const sinV=isN(vA)&&isN(vB)?fmtN(Math.sin(aR+bR),4):`sin${angPair}`;
+  const hc=smul(isN(vH)?Hm:str(vH),cosV);
+  const abs=smul(sAB,sinV);
+  const dfInner=(typeof hc==='number'&&typeof abs==='number')?fmtN(hc-abs,4):`${typeof hc==='number'?fmtN(hc,4):hc} - ${typeof abs==='number'?fmtN(abs,4):abs}`;
+  const sDF=typeof dfInner==='number'?Math.abs(dfInner):`|${dfInner}|`;
+  const sMW=smul(sW,isN(vCG)?GBm:str(vCG));
+  const sFexpr=sdiv(sMW,sDF);
+
+  return{
+    vH,vD,vCG,vA,vB,vM,vG,allNum,symbolic:!allNum,
+    Hm,AGm,GBm,ABm,alphaD,betaD,massN,gN,aR,bR,thetaF,ux,uy,
+    Wnum,dFnum,dWnum,MWnum,Fnum,
+    sH,sAG,sGB,sAl,sBe,sAB,sW,sDF,sMW,sFexpr,angPair,
+    zeroMass:isN(vM)&&massN===0,
+    negMass:isN(vM)&&massN<0,
+    zeroGB:isN(vCG)&&Math.abs(GBm)<1e-9,
+    zeroDF:allNum&&dFnum<1e-9,
+    forceLabel:lbl('lbl_force','F'),weightLabel:lbl('lbl_weight','mg'),
+    reactionLabel:lbl('lbl_reaction','R_B'),outputLabel:lbl('lbl_output','F'),
+  };
+}
+function lbl(id,fb){return((document.getElementById(id).value||'').trim().slice(0,22)||fb);}
+function fmt(v,d=3){if(v===null||v===undefined)return '?';if(!isFinite(v))return '∞';return Number(v).toFixed(d);}
+
+/* ══ VALIDATE — only check non-empty ══ */
+function validate(){
+  const ids=['inp_h','inp_d','inp_cg','inp_alpha','inp_beta','inp_mass','inp_g'];
+  const em=document.getElementById('errMsg');
+  document.querySelectorAll('.iw input').forEach(e=>e.classList.remove('err'));
+  em.style.display='none';
+  for(const id of ids){
+    const el=document.getElementById(id);
+    if(!(el.value||'').trim()){
+      el.classList.add('err');
+      em.textContent=`One field is empty. Every field needs a value — a number or a symbol.`;
+      em.style.display='block';return false;
     }
   }
   return true;
 }
 
-function deg(v){return v*Math.PI/180}
-function fmt(v,d=3,precision=true){return precision ? Number(v).toFixed(d) : v.toString()}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function ease(t){return 1-Math.pow(1-t,3)}
-function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
-function part(t,a,b){if(t<=a) return 0; if(t>=b) return 1; return easeInOut((t-a)/(b-a));}
-function getTheme(){
-  const dark=root.getAttribute('data-theme')!=='light';
-  return dark?{
-    bg:'#0f1629',text:'#edf4ff',muted:'#9aa7c4',line:'#87b8ff',bar:'#7aa9ff',ground:'#667692',force:'#42e3ba',weight:'#ff7f8f',reaction:'#ffc85c',dim:'#9aa7c4',box:'rgba(10,16,32,.74)',wheel:'#2a3a58',tray:'#233252',fill:'#dbe7ff'
-  }:{
-    bg:'#ffffff',text:'#17233b',muted:'#60718f',line:'#2f4e88',bar:'#3768c4',ground:'#8a97ab',force:'#0ca881',weight:'#d94862',reaction:'#c98b00',dim:'#657594',box:'rgba(255,255,255,.9)',wheel:'#b9c9e9',tray:'#dfe9fb',fill:'#17233b'
+/* ══ STYLE SYMBOLIC INPUTS ══ */
+function styleInputs(){
+  ['inp_h','inp_d','inp_cg','inp_alpha','inp_beta','inp_mass','inp_g'].forEach(id=>{
+    const el=document.getElementById(id);
+    const raw=(el.value||'').trim();
+    el.classList.toggle('sym',raw!==''&&isNaN(parseFloat(raw)));
+  });
+}
+document.querySelectorAll('.iw input').forEach(el=>el.addEventListener('input',styleInputs));
+
+/* ══ RESULTS ══ */
+function showResults(p){
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('modeTag').textContent=p.symbolic?'SYMBOLIC':'NUMERIC';
+  document.getElementById('symBanner').classList.toggle('on',p.symbolic);
+
+  const banner=document.getElementById('caseBanner');
+  let bh='';
+  if(p.symbolic)bh=`<div class="case-banner cb-sym">🔣 <strong>Symbolic mode:</strong> General formula shown. All known values substituted. FBD uses fallback dimensions for drawing.</div>`;
+  else if(p.zeroMass)bh=`<div class="case-banner cb-info">ℹ️ <strong>Zero mass:</strong> W = 0 → no weight moment → ${p.outputLabel} = 0 N. Empty wheelbarrow needs no force.</div>`;
+  else if(p.negMass)bh=`<div class="case-banner cb-warn">⚠️ <strong>Negative mass (${p.massN} kg):</strong> Mathematically valid — negative force means direction reverses.</div>`;
+  else if(p.zeroGB)bh=`<div class="case-banner cb-info">ℹ️ <strong>G at pivot B (G→B = 0):</strong> Weight has zero moment arm → zero moment → ${p.outputLabel} = 0 N.</div>`;
+  else if(p.zeroDF)bh=`<div class="case-banner cb-warn">⚠️ <strong>Impossible:</strong> Force line passes through B (d_F = 0). No finite force can balance M_W = ${fmt(p.MWnum,2)} N·m.</div>`;
+  banner.innerHTML=bh;banner.style.display=bh?'block':'none';
+
+  function sc(id,val){
+    const el=document.getElementById(id);
+    const isSym=typeof val==='string'&&val!=='∞'&&isNaN(parseFloat(val));
+    el.textContent=val;
+    el.className='cv'+(isSym?' sym-val':'');
+  }
+
+  if(p.symbolic){
+    sc('r_W',typeof p.sW==='number'?fmt(p.sW,2):p.sW);
+    sc('r_dF',typeof p.sDF==='number'?fmt(p.sDF,4):p.sDF);
+    sc('r_dW',p.sGB);
+    sc('r_Mw',typeof p.sMW==='number'?fmt(p.sMW,2):p.sMW);
+    sc('r_F',typeof p.sFexpr==='number'?fmt(p.sFexpr,2):p.sFexpr);
+    document.getElementById('r_unit').textContent='formula';
+  } else {
+    const Fv=p.zeroMass||p.zeroGB?0:p.Fnum;
+    sc('r_W',fmt(p.Wnum,1));
+    sc('r_dF',p.zeroDF?'0':fmt(p.dFnum,4));
+    sc('r_dW',fmt(p.dWnum,3));
+    sc('r_Mw',fmt(p.MWnum,1));
+    sc('r_F',p.zeroDF?'∞':fmt(Fv,2));
+    document.getElementById('r_unit').textContent='N';
+  }
+  document.getElementById('r_sym').textContent=p.outputLabel;
+  buildEq(p);buildSteps(p);
+}
+
+function buildEq(p){
+  const O=p.outputLabel,T=TH();
+  const cy=dark?'#38bdf8':'#0284c7',vi=dark?'#a78bfa':'#7c3aed',gr=dark?'#34d399':'#059669',rs=dark?'#fb7185':'#e11d48',or=dark?'#fb923c':'#ea580c';
+  let html;
+  if(p.symbolic){
+    const W=typeof p.sW==='number'?fmt(p.sW,2):p.sW;
+    const dF=typeof p.sDF==='number'?fmt(p.sDF,4):p.sDF;
+    const Fe=typeof p.sFexpr==='number'?fmt(p.sFexpr,2):p.sFexpr;
+    html=`<span style="color:var(--muted)">ΣM_B = 0</span><br><span style="color:${cy}">${O}</span> · <span style="color:${or}">${dF}</span> = <span style="color:${rs}">${W}</span> · <span style="color:${rs}">${p.sGB}</span><br><strong style="color:${vi}">${O} = ${Fe}</strong>`;
+  } else if(p.zeroDF){
+    html=`<span style="color:var(--muted)">ΣM_B = 0</span><br>${O} · <span style="color:${rs}">0</span> = ${fmt(p.Wnum,1)} · ${fmt(p.dWnum,3)}<br><span style="color:${rs}">No finite solution — d_F = 0 m</span>`;
+  } else {
+    const Fv=p.zeroMass||p.zeroGB?0:p.Fnum;
+    html=`<span style="color:var(--muted)">ΣM_B = 0</span><br><span style="color:${cy}">${O}</span> · <span style="color:${or}">${fmt(p.dFnum,4)}</span> = <span style="color:${rs}">${fmt(p.Wnum,1)}</span> · <span style="color:${rs}">${fmt(p.dWnum,3)}</span><br><strong style="color:${gr}">${O} = ${p.zeroDF?'∞':fmt(Fv,2)} N</strong>`;
+  }
+  document.getElementById('eqBox').innerHTML=html;
+}
+
+function buildSteps(p){
+  const O=p.outputLabel,W=p.weightLabel,R=p.reactionLabel,sym=p.symbolic;
+  let steps=[];
+  if(p.zeroMass){
+    steps=[
+      {t:'Weight force',d:'Mass = 0 kg, so weight W = 0 N.',m:`W = 0 × ${fmt(p.gN)} = 0 N`},
+      {t:'No moment',d:'Zero weight → zero moment about B → zero applied force needed.',m:`${O} = 0 N`},
+    ];
+  } else if(p.zeroGB){
+    steps=[
+      {t:'Weight moment arm',d:'G coincides with pivot B. Horizontal distance d_W = G→B = 0.',m:`d_W = 0 m → M_W = 0 N·m`},
+      {t:'Required force',d:'No moment to balance → no force needed.',m:`${O} = 0 N`},
+    ];
+  } else if(p.zeroDF){
+    steps=[
+      {t:'Weight moment',d:`W = ${fmt(p.Wnum,1)} N at G, arm d_W = ${fmt(p.dWnum,3)} m.`,m:`M_W = ${fmt(p.MWnum,2)} N·m (clockwise)`},
+      {t:'Force arm = 0',d:'Force line of action passes through pivot B. Zero moment arm.',m:`d_F = 0 → ${O} = ∞ (impossible)`},
+    ];
+  } else if(sym){
+    const Ws=typeof p.sW==='number'?fmt(p.sW,2):p.sW;
+    const dFs=typeof p.sDF==='number'?fmt(p.sDF,4):p.sDF;
+    const Fs=typeof p.sFexpr==='number'?fmt(p.sFexpr,2):p.sFexpr;
+    steps=[
+      {t:'Free body diagram',d:`Applied force ${O} at A (at angle α above bar), weight ${W} downward at G, reaction ${R} upward at B.`,m:`ΣM_B = 0`,s:1},
+      {t:'Weight W',d:`W = mass × gravity.${!p.vM.isNum||!p.vG.isNum?' One or both are symbolic.':''}`,m:`${W} = ${Ws}`,s:1},
+      {t:'β — Bar angle from horizontal (at B)',d:`β = ${p.sBe} is the angle the bar makes with the horizontal ground, measured at the wheel pivot B.`,m:`β = ${p.sBe}`,s:1},
+      {t:'α — Force angle from bar (at A)',d:`α = ${p.sAl} is the angle between the applied force F and the bar, measured at handle A.`,m:`α = ${p.sAl}`,s:1},
+      {t:'Weight moment arm d_W',d:`The weight W acts vertically. Its perpendicular distance from pivot B = horizontal distance G→B.`,m:`d_W = ${p.sGB}`,s:1},
+      {t:'Force moment arm d_F',d:`Cross product of (A−B) with unit force vector. Simplifies to: d_F = |h·cos(α+β) − AB·sin(α+β)|`,m:`d_F = |${p.sH}·cos${p.angPair} − ${p.sAB}·sin${p.angPair}|\n    = ${dFs}`,s:1},
+      {t:`Solve ${O}`,d:'ΣM_B = 0 → F·d_F = W·d_W → solve for F.',m:`${O} = (${Ws} × ${p.sGB}) / ${dFs}\n   = ${Fs}`,s:1},
+    ];
+  } else {
+    const Fv=p.Fnum;
+    steps=[
+      {t:'Free body diagram',d:`Three external forces: ${O} at A (α=${p.alphaD}° above bar), ${W} at G (vertical down), ${R} at B (vertical up from wheel).`,m:`ΣM_B = 0`},
+      {t:'β — Bar angle from horizontal',d:`β = ${p.betaD}° is the bar's inclination above horizontal, measured at wheel B. Sets the bar's direction in space.`,m:`β = ${p.betaD}°  (bar from horizontal, at B)`},
+      {t:'α — Force angle from bar',d:`α = ${p.alphaD}° is the angle between the applied force ${O} and the bar, measured at handle A. Force direction from +x axis = 180°−β−α.`,m:`α = ${p.alphaD}°  (force from bar, at A)\nθ_F = 180°−${p.betaD}°−${p.alphaD}° = ${fmt(180-p.betaD-p.alphaD,1)}°`},
+      {t:'Weight force',d:`Multiply mass by gravitational acceleration.`,m:`${W} = ${fmt(p.massN)} × ${fmt(p.gN)} = ${fmt(p.Wnum,2)} N`},
+      {t:'Weight moment arm d_W',d:`Weight W is vertical. Its perpendicular distance from pivot B = horizontal G→B distance.`,m:`d_W = ${fmt(p.dWnum,3)} m`},
+      {t:'Force moment arm d_F',d:`Cross product of position vector (A−B) with force unit vector.`,m:`(A−B) = (−${fmt(p.ABm,3)}, ${fmt(p.Hm,3)}) m\nû_F = (${fmt(p.ux,4)}, ${fmt(p.uy,4)})\nd_F = |${fmt(p.dFnum,4)}| m`},
+      {t:`Solve ${O} — moment equilibrium`,d:`Clockwise moment (weight) = Counter-clockwise moment (force).`,m:`${O} × ${fmt(p.dFnum,4)} = ${fmt(p.Wnum,2)} × ${fmt(p.dWnum,3)}\n${O} = ${fmt(p.MWnum,2)} / ${fmt(p.dFnum,4)} = ${fmt(Fv,2)} N`},
+    ];
+  }
+  document.getElementById('stepsWrap').innerHTML=`<div class="steps">${steps.map((s,i)=>`<div class="step ${s.s?'sym':'done'}"><div class="snum">${i+1}</div><div><div class="stitle">${s.t}</div><div class="sdesc">${s.d}</div><div class="math${s.s?' sm':''}">${s.m.replace(/\n/g,'<br>')}</div></div></div>`).join('')}</div>`;
+}
+
+/* ══ CANVAS ══ */
+const canvas=document.getElementById('fbdCanvas');
+const ctx=canvas.getContext('2d');
+let _raf=null;
+window._tab='fbd';window._P=null;
+
+function bgFill(){
+  const t=TH();
+  ctx.fillStyle=t.cvs;ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle=t.grid;ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}
+  for(let y=0;y<canvas.height;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
+}
+
+function ease(t){return 1-Math.pow(1-Math.max(0,Math.min(1,t)),3)}
+function eio(t){t=Math.max(0,Math.min(1,t));return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function part(t,a,b){if(t<=a)return 0;if(t>=b)return 1;return eio((t-a)/(b-a))}
+
+function arw(x1,y1,x2,y2,col,prog,lbl2,lx,ly,lw=3){
+  const p=ease(Math.max(0,Math.min(1,prog)));
+  const px=x1+(x2-x1)*p,py=y1+(y2-y1)*p;
+  ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';
+  ctx.shadowColor=col;ctx.shadowBlur=12;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(px,py);ctx.stroke();
+  if(prog>.72){
+    const k=(prog-.72)/.28,ang=Math.atan2(y2-y1,x2-x1),hs=13;
+    ctx.globalAlpha=k;
+    ctx.beginPath();ctx.moveTo(px,py);
+    ctx.lineTo(px-hs*Math.cos(ang-Math.PI/7),py-hs*Math.sin(ang-Math.PI/7));
+    ctx.lineTo(px-hs*Math.cos(ang+Math.PI/7),py-hs*Math.sin(ang+Math.PI/7));
+    ctx.closePath();ctx.fill();
+  }
+  if(lbl2&&prog>.88){
+    ctx.globalAlpha=(prog-.88)/.12;ctx.shadowBlur=0;
+    ctx.font='bold 15px Space Grotesk,sans-serif';
+    ctx.fillText(lbl2,lx??x2+7,ly??y2-7);
+  }
+  ctx.restore();
+}
+
+function dot(x,y,col,r,lbl2,prog,lx,ly){
+  if(prog<=0)return;const p=ease(prog);
+  ctx.save();ctx.globalAlpha=p;ctx.shadowColor=col;ctx.shadowBlur=16;
+  ctx.beginPath();ctx.arc(x,y,r*p,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+  if(lbl2&&prog>.65){
+    ctx.globalAlpha=(prog-.65)/.35;ctx.shadowBlur=0;
+    ctx.font='bold 14px Space Grotesk,sans-serif';ctx.fillStyle=col;
+    ctx.fillText(lbl2,lx??x+8,ly??y-10);
+  }
+  ctx.restore();
+}
+
+function txt(x,y,s,col,font,a=1,align='left'){
+  if(a<=0)return;ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,a));
+  ctx.fillStyle=col;ctx.font=font||'11px Space Grotesk,sans-serif';
+  ctx.textAlign=align;ctx.fillText(s,x,y);ctx.restore();
+}
+
+function dash(x1,y1,x2,y2,col,prog=1,d=[6,4],w=1.8){
+  const p=ease(prog);ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(d);ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1+(x2-x1)*p,y1+(y2-y1)*p);ctx.stroke();ctx.restore();
+}
+
+function arcAngle(cx,cy,r,sa,ea,col,prog=1,lbl2,lx,ly,lw=2.2){
+  if(prog<=0)return;const p=ease(prog);
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';
+  ctx.shadowColor=col;ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(cx,cy,r,sa,sa+(ea-sa)*p);ctx.stroke();
+  // arrowhead at end
+  if(prog>.65){
+    const k=(prog-.65)/.35,endA=sa+(ea-sa)*p;
+    const tx=cx+r*Math.cos(endA),ty=cy+r*Math.sin(endA);
+    const sign=ea>sa?1:-1,tg=endA+Math.PI/2*sign;
+    ctx.globalAlpha=k;ctx.fillStyle=col;
+    ctx.beginPath();ctx.moveTo(tx,ty);
+    ctx.lineTo(tx-9*Math.cos(tg-.42),ty-9*Math.sin(tg-.42));
+    ctx.lineTo(tx-9*Math.cos(tg+.42),ty-9*Math.sin(tg+.42));
+    ctx.closePath();ctx.fill();
+  }
+  if(lbl2&&prog>.82){
+    ctx.globalAlpha=(prog-.82)/.18;ctx.shadowBlur=0;
+    ctx.fillStyle=col;ctx.font='bold 13px Space Mono,monospace';
+    ctx.textAlign='left';ctx.fillText(lbl2,lx,ly);
+  }
+  ctx.restore();
+}
+
+/* ══ DRAW FULL FBD ══ */
+function drawFBD(p,t){
+  bgFill();const Th=TH();
+  const CW=canvas.width,CH=canvas.height;
+  const scale=Math.min(CW,CH)*0.35;
+  const Bx=CW*0.60,By=CH*0.70;
+  const Ax=Bx-p.ABm*scale,Ay=By-p.Hm*scale;
+  const Gx=Bx-p.GBm*scale,Gy=By-(p.GBm/p.ABm)*p.Hm*scale;
+
+  const t0=part(t,0,.12),t1=part(t,.08,.28),t2=part(t,.22,.42),
+        t3=part(t,.35,.55),t4=part(t,.48,.70),t5=part(t,.62,.84),t6=part(t,.78,1.0);
+
+  // Ground
+  ctx.save();ctx.globalAlpha=t0;
+  ctx.fillStyle=Th.ground;ctx.fillRect(0,By+28,CW,CH);
+  ctx.strokeStyle=Th.gndL;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,By+28);ctx.lineTo(CW,By+28);ctx.stroke();
+  ctx.strokeStyle=Th.gndL;ctx.lineWidth=1;ctx.globalAlpha=t0*0.3;
+  for(let x=-30;x<CW;x+=22){ctx.beginPath();ctx.moveTo(x,By+28);ctx.lineTo(x+30,By+60);ctx.stroke()}
+  ctx.restore();
+
+  // Wheel at B
+  const wr=32;
+  ctx.save();ctx.globalAlpha=t0;
+  ctx.beginPath();ctx.arc(Bx,By,wr,0,Math.PI*2);ctx.fillStyle=Th.wheel;ctx.fill();
+  ctx.strokeStyle=Th.wheelR;ctx.lineWidth=3.5;ctx.shadowColor=Th.wheelR;ctx.shadowBlur=12;ctx.stroke();
+  ctx.globalAlpha=t0*.4;ctx.shadowBlur=0;ctx.lineWidth=1.5;
+  for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(Bx,By);ctx.lineTo(Bx+wr*Math.cos(a),By+wr*Math.sin(a));ctx.stroke()}
+  ctx.restore();
+
+  // Bar A→B
+  ctx.save();ctx.globalAlpha=ease(t1);
+  ctx.strokeStyle=Th.barS;ctx.lineWidth=7;ctx.lineCap='round';ctx.shadowColor=Th.barS;ctx.shadowBlur=10;
+  ctx.beginPath();ctx.moveTo(Ax+(Bx-Ax)*(1-ease(t1)),Ay+(By-Ay)*(1-ease(t1)));ctx.lineTo(Bx,By);ctx.stroke();
+  if(t1>.3){
+    const k=(t1-.3)/.7;ctx.globalAlpha=k*.6;ctx.shadowBlur=0;
+    const tw=Math.abs(Gx-Ax)*.88;
+    ctx.fillStyle=Th.bar;ctx.beginPath();ctx.roundRect((Ax+Gx)/2-tw/2,Gy-22,tw,22,5);ctx.fill();
+    ctx.strokeStyle=Th.barS;ctx.lineWidth=1.5;ctx.stroke();
+  }
+  ctx.restore();
+
+  // Points A, B, G
+  dot(Bx,By,Th.wheelR,8,'B',t1,Bx+13,By-13);
+  dot(Ax,Ay,Th.pt,6,'A',t1,Ax-22,Ay-11);
+  dot(Gx,Gy,Th.muted,5,'G',t1,Gx+10,Gy-10);
+
+  // Weight ↓ at G
+  arw(Gx,Gy,Gx,Gy+95,Th.weight,t3,p.weightLabel,Gx+9,Gy+104);
+  // Reaction ↑ at B
+  arw(Bx,By,Bx,By-90,Th.reaction,t3,p.reactionLabel,Bx+9,By-97);
+  // Applied force at A
+  const fLen=100;
+  const fx=Math.cos(p.thetaF),fy=-Math.sin(p.thetaF); // screen y flipped
+  arw(Ax,Ay,Ax+fx*fLen,Ay+fy*fLen,Th.force,t4,p.forceLabel,Ax+fx*fLen+7,Ay+fy*fLen-7);
+
+  /* ── β at B: angle between bar and horizontal ── */
+  if(t5>0){
+    const barAngle=Math.PI-p.bR; // screen angle of bar from +x (pointing toward A = upper-left)
+    const betaR=58;
+    // Arc from π (pointing left = horizontal left) to barAngle
+    arcAngle(Bx,By,betaR,Math.PI,barAngle,Th.beta,t5,null,0,0,2.5);
+    // horizontal dashed reference at B
+    dash(Bx-betaR-18,By,Bx+20,By,Th.beta,t5,[6,4],1.5);
+    if(t5>.55){
+      const k=(t5-.55)/.45;
+      const midA=(Math.PI+barAngle)/2;
+      const lbx=Bx+(betaR+26)*Math.cos(midA),lby=By+(betaR+26)*Math.sin(midA);
+      ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.beta;
+      ctx.font='bold 18px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('β',lbx,lby);
+      ctx.font='11px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;
+      ctx.fillText(`β = ${p.sBe}  ← bar angle from horizontal`,Bx-betaR-18,By+betaR+8);
+      ctx.restore();
+    }
+  }
+
+  /* ── α at A: angle between force and bar ── */
+  if(t4>.25){
+    const k=Math.max(0,(t4-.25)/.75);
+    const barDirScreen=Math.PI-p.bR; // bar direction from A toward B in screen coords
+    const forceDirScreen=Math.atan2(fy,fx); // force direction in screen coords
+    const alphaR=50;
+    arcAngle(Ax,Ay,alphaR,barDirScreen,forceDirScreen,Th.alpha,k,null,0,0,2.5);
+    // bar reference line at A
+    dash(Ax,Ay,Ax+50*Math.cos(barDirScreen),Ay+50*Math.sin(barDirScreen),Th.alpha,k,[5,4],1.5);
+    if(k>.5){
+      const ka=(k-.5)/.5;
+      const midA=(barDirScreen+forceDirScreen)/2;
+      const lax=Ax+(alphaR+26)*Math.cos(midA),lay=Ay+(alphaR+26)*Math.sin(midA);
+      ctx.save();ctx.globalAlpha=ka;ctx.fillStyle=Th.alpha;
+      ctx.font='bold 18px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',lax,lay);
+      ctx.font='11px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;
+      // small note near A
+      ctx.textAlign='left';ctx.fillText(`α = ${p.sAl}  ← force angle from bar`,Ax+10,Ay+40);
+      ctx.restore();
+    }
+  }
+
+  // Result / formula box
+  if(t6>.4){
+    const rx=CW-210,ry=14,rw=196,rh=p.symbolic?74:90;
+    const ka=(t6-.4)/.6;
+    ctx.save();ctx.globalAlpha=ka;
+    ctx.fillStyle=Th.box;ctx.strokeStyle=Th.boxB;ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(rx,ry,rw,rh,13);ctx.fill();ctx.stroke();
+    ctx.font='700 12px Space Mono,monospace';
+    if(p.symbolic){
+      ctx.fillStyle=Th.dim;ctx.fillText('General Formula:',rx+12,ry+22);
+      ctx.fillStyle=dark?'#a78bfa':'#7c3aed';ctx.font='11px Space Mono,monospace';
+      const fs=typeof p.sFexpr==='number'?fmt(p.sFexpr,2):String(p.sFexpr);
+      ctx.fillText(`${p.outputLabel} = ${fs.length>20?fs.slice(0,20)+'…':fs}`,rx+12,ry+42);
+      ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+      ctx.fillText('Substitute values to compute',rx+12,ry+60);
+    } else {
+      const Fv=p.zeroMass||p.zeroGB?0:p.Fnum;
+      ctx.fillStyle=Th.force;ctx.fillText(`${p.outputLabel} = ${p.zeroDF?'∞':fmt(Fv,2)} N`,rx+12,ry+24);
+      ctx.fillStyle=Th.muted;ctx.font='10px Space Grotesk,sans-serif';
+      ctx.fillText(`d_F = ${fmt(p.dFnum,4)} m`,rx+12,ry+42);
+      ctx.fillText(`d_W = ${fmt(p.dWnum,3)} m`,rx+12,ry+56);
+      ctx.fillText(`W   = ${fmt(p.Wnum,1)} N`,rx+12,ry+70);
+    }
+    ctx.restore();
+  }
+
+  // Legend
+  const legend=[
+    {c:Th.force,   l:`${p.forceLabel}  — Applied force`},
+    {c:Th.weight,  l:`${p.weightLabel}  — Weight`},
+    {c:Th.reaction,l:`${p.reactionLabel}  — Wheel reaction`},
+    {c:Th.beta,    l:`β  — Bar angle from horizontal (at B)`},
+    {c:Th.alpha,   l:`α  — Force angle from bar (at A)`},
+  ];
+  ctx.save();ctx.globalAlpha=t6;
+  legend.forEach((it,i)=>{
+    ctx.shadowColor=it.c;ctx.shadowBlur=5;ctx.fillStyle=it.c;ctx.fillRect(12,18+i*18,10,3);
+    ctx.shadowBlur=0;ctx.fillStyle=Th.text;ctx.font='10px Space Grotesk,sans-serif';
+    ctx.fillText(it.l,26,24+i*18);
+  });
+  ctx.restore();
+}
+
+/* ══ DRAW GEOMETRY ══ */
+function drawGeom(p,t){
+  bgFill();const Th=TH();
+  const CW=canvas.width,CH=canvas.height;
+  const scale=Math.min(CW,CH)*0.33;
+  const Bx=CW*0.60,By=CH*0.65;
+  const Ax=Bx-p.ABm*scale,Ay=By-p.Hm*scale;
+  const Gx=Bx-p.GBm*scale,Gy=By-(p.GBm/p.ABm)*p.Hm*scale;
+
+  const t0=part(t,0,.15),t1=part(t,.10,.32),t2=part(t,.26,.50),
+        t3=part(t,.44,.66),t4=part(t,.60,.82),t5=part(t,.78,1.0);
+
+  dash(0,By,CW,By,Th.gndL,t0,[10,6],1.5);
+  txt(CW-70,By-8,'Ground',Th.muted,'11px Space Grotesk,sans-serif',t0*.8);
+
+  ctx.save();ctx.globalAlpha=ease(t1);ctx.strokeStyle=Th.barS;ctx.lineWidth=6;ctx.lineCap='round';ctx.shadowColor=Th.barS;ctx.shadowBlur=10;
+  const bp=ease(t1);ctx.beginPath();ctx.moveTo(Ax,Ay);ctx.lineTo(Ax+(Bx-Ax)*bp,Ay+(By-Ay)*bp);ctx.stroke();ctx.restore();
+
+  dot(Bx,By,Th.wheelR,7,'B',t1,Bx+13,By-13);
+  dot(Ax,Ay,Th.pt,6,'A',t1,Ax-22,Ay-11);
+  dot(Gx,Gy,Th.arm,5,'G',t1,Gx+10,Gy-10);
+
+  dash(Ax,Ay,Ax,By,Th.dim,t2,[5,4],2);
+  if(t2>.5)txt(Ax-58,By-(By-Ay)/2,`h = ${p.vH.isNum?fmt(p.Hm,3)+'m':p.sH}`,Th.dim,'bold 12px Space Mono,monospace',(t2-.5)/.5);
+
+  dash(Ax,By,Bx,By,Th.dim,t2,[5,4],2);
+  if(t2>.5)txt((Ax+Bx)/2,By+20,`AB = ${p.allNum?fmt(p.ABm,3)+'m':p.sAB}`,Th.dim,'bold 12px Space Mono,monospace',(t2-.5)/.5,'center');
+
+  dash(Ax,By+42,Gx,By+42,Th.arm,t3,[4,3],2);
+  dash(Gx,By+42,Bx,By+42,Th.reaction,t3,[4,3],2);
+  if(t3>.5){
+    const k=(t3-.5)/.5;
+    dot(Gx,By+42,Th.arm,3,'',k);
+    txt((Ax+Gx)/2,By+60,`AG = ${p.vD.isNum?fmt(p.AGm,3)+'m':p.sAG}`,Th.arm,'bold 11px Space Mono,monospace',k,'center');
+    txt((Gx+Bx)/2,By+60,`GB = ${p.vCG.isNum?fmt(p.GBm,3)+'m':p.sGB}`,Th.reaction,'bold 11px Space Mono,monospace',k,'center');
+  }
+
+  // β arc at B
+  if(t4>0){
+    const barA=Math.PI-p.bR;
+    arcAngle(Bx,By,54,Math.PI,barA,Th.beta,t4,null,0,0,2.2);
+    dash(Bx-72,By,Bx+16,By,Th.beta,t4,[6,4],1.5);
+    if(t4>.6){const k=(t4-.6)/.4;ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.beta;ctx.font='bold 17px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('β',Bx-95,By+22);ctx.font='10px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;ctx.fillText(`β = ${p.sBe}  (bar from horizontal, at B)`,Bx-95,By+38);ctx.restore()}
+  }
+
+  // α — show force direction arrow and arc at A
+  if(t4>0){
+    const barA=Math.PI-p.bR;
+    const forceA=Math.atan2(-p.uy,p.ux);
+    arcAngle(Ax,Ay,42,barA,forceA,Th.alpha,t4,null,0,0,2.2);
+    dash(Ax,Ay,Ax+48*Math.cos(barA),Ay+48*Math.sin(barA),Th.alpha,t4,[5,4],1.5);
+    arw(Ax,Ay,Ax+Math.cos(p.thetaF)*60,Ay-Math.sin(p.thetaF)*60,Th.alpha,t4,null,0,0,2);
+    if(t4>.6){const k=(t4-.6)/.4;const mid=(barA+forceA)/2;ctx.save();ctx.globalAlpha=k;ctx.fillStyle=Th.alpha;ctx.font='bold 17px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',Ax+65*Math.cos(mid),Ay+65*Math.sin(mid));ctx.font='10px Space Grotesk,sans-serif';ctx.fillStyle=Th.muted;ctx.textAlign='left';ctx.fillText(`α = ${p.sAl}  (force from bar, at A)`,Ax+12,Ay+44);ctx.restore()}
+  }
+
+  // info box
+  if(t5>0){
+    const bx=14,by2=14,bw=225,bh=138;
+    ctx.save();ctx.globalAlpha=t5;
+    ctx.fillStyle=Th.box;ctx.strokeStyle=Th.boxB;ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(bx,by2,bw,bh,13);ctx.fill();ctx.stroke();
+    const rows=[
+      {c:Th.pt,l:`h  = ${p.vH.isNum?fmt(p.Hm,3)+'m':p.sH}`},
+      {c:Th.arm,l:`AG = ${p.vD.isNum?fmt(p.AGm,3)+'m':p.sAG}`},
+      {c:Th.reaction,l:`GB = ${p.vCG.isNum?fmt(p.GBm,3)+'m':p.sGB}`},
+      {c:Th.barS,l:`AB = ${p.allNum?fmt(p.ABm,3)+'m':p.sAB}`},
+      {c:Th.beta,l:`β  = ${p.sBe}  (bar ∠ horizontal)`},
+      {c:Th.alpha,l:`α  = ${p.sAl}  (force ∠ bar)`},
+    ];
+    ctx.font='700 12px Space Mono,monospace';
+    rows.forEach((r,i)=>{ctx.fillStyle=r.c;ctx.fillText(r.l,bx+14,by2+25+i*18)});
+    ctx.restore();
   }
 }
 
-function clearCanvas(){const t=getTheme();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=t.bg;ctx.fillRect(0,0,canvas.width,canvas.height)}
+/* ══ DRAW MOMENTS ══ */
+function drawMoments(p,t){
+  bgFill();const Th=TH();
+  const CW=canvas.width,CH=canvas.height;
+  const scale=Math.min(CW,CH)*0.31;
+  const Bx=CW*0.52,By=CH*0.57;
+  const Ax=Bx-p.ABm*scale,Ay=By-p.Hm*scale;
+  const Gx=Bx-p.GBm*scale,Gy=By-(p.GBm/p.ABm)*p.Hm*scale;
+
+  const t0=part(t,0,.15),t1=part(t,.12,.32),t2=part(t,.28,.52),
+        t3=part(t,.45,.70),t4=part(t,.62,.85),t5=part(t,.80,1.0);
+
+  ctx.save();ctx.globalAlpha=t0;ctx.strokeStyle=Th.muted;ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(Ax,Ay);ctx.lineTo(Bx,By);ctx.stroke();ctx.restore();
+  dot(Bx,By,Th.wheelR,8,'B (Pivot)',t0,Bx+13,By-13);
+  dot(Ax,Ay,Th.pt,6,'A',t0,Ax-22,Ay-11);
+  dot(Gx,Gy,Th.arm,6,'G',t0,Gx+10,Gy-10);
+
+  // Weight arm
+  dash(Gx,Gy,Bx,Gy,Th.weight,t1,[5,4],2.5);
+  if(t1>.5)txt((Gx+Bx)/2,Gy-14,`d_W = ${p.vCG.isNum?fmt(p.dWnum,3)+'m':p.sGB}`,Th.weight,'bold 13px Space Mono,monospace',(t1-.5)/.5,'center');
+  arw(Gx,Gy,Gx,Gy+90,Th.weight,t1,p.weightLabel,Gx+9,Gy+100);
+
+  // Weight moment arc
+  if(t2>0)arcAngle(Bx,By,56,-Math.PI/2,-Math.PI/2+.9,Th.weight,t2,
+    `M_W=${p.allNum?fmt(p.MWnum,1)+'N·m':String(p.sMW)}`,Bx+62,By-54);
+
+  // Applied force + α label
+  if(t3>0){
+    const fLen=95,fx=Math.cos(p.thetaF),fy=-Math.sin(p.thetaF);
+    arw(Ax,Ay,Ax+fx*fLen,Ay+fy*fLen,Th.force,t3,p.forceLabel,Ax+fx*fLen+7,Ay+fy*fLen-7);
+    // α arc
+    if(t3>.4){
+      const k=(t3-.4)/.6;
+      const barA=Math.PI-p.bR,forceA=Math.atan2(-p.uy,p.ux);
+      arcAngle(Ax,Ay,36,barA,forceA,Th.alpha,k,null,0,0,2);
+      dash(Ax,Ay,Ax+40*Math.cos(barA),Ay+40*Math.sin(barA),Th.alpha,k,[5,4],1.5);
+      if(k>.5){const ka=(k-.5)/.5;const mid=(barA+forceA)/2;ctx.save();ctx.globalAlpha=ka;ctx.fillStyle=Th.alpha;ctx.font='bold 15px Space Mono,monospace';ctx.textAlign='center';ctx.fillText('α',Ax+56*Math.cos(mid),Ay+56*Math.sin(mid));ctx.restore()}
+    }
+
+    // Perp arm from B to force line
+    if(t4>0&&p.dFnum>1e-6){
+      const bax=Bx-Ax,bay=By-Ay;
+      const s2=bax*fx+bay*fy;
+      const footX=Ax+s2*fx,footY=Ay+s2*fy;
+      dash(Bx,By,footX,footY,Th.arm,t4,[5,3],2.5);
+      if(t4>.5){
+        const k=(t4-.5)/.5;
+        ctx.save();ctx.globalAlpha=k;ctx.strokeStyle=Th.arm;ctx.lineWidth=1.8;
+        const ex=footX-Bx,ey=footY-By,el=Math.sqrt(ex*ex+ey*ey)||1;
+        const nx=-ey/el*10,ny=ex/el*10;
+        ctx.beginPath();ctx.moveTo(footX+nx*.65,footY+ny*.65);
+        ctx.lineTo(footX+nx*.65+(ex/el)*10*.65,footY+ny*.65+(ey/el)*10*.65);
+        ctx.lineTo(footX+(ex/el)*10*.65,footY+(ey/el)*10*.65);ctx.stroke();
+        txt((Bx+footX)/2+10,(By+footY)/2-10,
+          `d_F = ${p.allNum?fmt(p.dFnum,4)+'m':p.sDF}`,Th.arm,'bold 12px Space Mono,monospace',k);
+        ctx.restore();
+      }
+      if(t5>0){
+        const Fv=p.allNum&&!p.zeroDF?p.Fnum:null;
+        arcAngle(Bx,By,76,-Math.PI/2+.9,-Math.PI/2+.9+.9,Th.force,t5,
+          `M_F=${Fv!==null?fmt(Fv*p.dFnum,1)+'N·m':String(p.sFexpr)+'·d_F'}`,Bx-210,By-72);
+      }
+    }
+  }
+
+  if(t5>0){
+    const sx=CW-228,sy=14,sw=214,sh=p.symbolic?95:108;
+    ctx.save();ctx.globalAlpha=t5;
+    ctx.fillStyle=Th.box;ctx.strokeStyle=Th.boxB;ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(sx,sy,sw,sh,13);ctx.fill();ctx.stroke();
+    const Ws=typeof p.sW==='number'?fmt(p.sW,2):p.sW;
+    const rows=[
+      {c:Th.weight,l:`M_W = ${p.allNum?fmt(p.MWnum,2)+'N·m':Ws+'×'+p.sGB}`},
+      {c:Th.arm,   l:`d_F = ${p.allNum?fmt(p.dFnum,4)+'m':p.sDF}`},
+      {c:Th.force, l:`d_W = ${p.allNum?fmt(p.dWnum,3)+'m':p.sGB}`},
+      {c:Th.barS,  l:`${p.outputLabel} = ${p.allNum?(p.zeroDF?'∞':fmt(p.Fnum,2))+'N':p.sFexpr}`},
+    ];
+    ctx.font='700 12px Space Mono,monospace';
+    rows.forEach((r,i)=>{ctx.fillStyle=r.c;ctx.fillText(r.l,sx+12,sy+24+i*20)});
+    ctx.restore();
+  }
+}
+
+/* ══ ANIMATION ══ */
+function animateTab(p,tab,sw=false){
+  if(_raf){cancelAnimationFrame(_raf);_raf=null}
+  const badge=document.getElementById('statusBadge');
+  function go(){
+    badge.classList.add('on');
+    const dur=1900,start=performance.now();
+    function frame(now){
+      const t=Math.min((now-start)/dur,1);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if(tab==='fbd')drawFBD(p,t);
+      else if(tab==='geom')drawGeom(p,t);
+      else drawMoments(p,t);
+      if(t<1){_raf=requestAnimationFrame(frame)}else{badge.classList.remove('on')}
+    }
+    _raf=requestAnimationFrame(frame);
+  }
+  if(sw){canvas.classList.add('switching');setTimeout(()=>{canvas.classList.remove('switching');go()},280)}
+  else go();
+}
 
 function drawPlaceholder(){
-  clearCanvas();
-  const t=getTheme();
-  textFade('🚀 Enter ANY values your professor gives',canvas.width/2,canvas.height/2-8,1,'700 18px Inter,sans-serif',t.text,'center');
-  textFade('Works with zeros, negatives, ANY symbols!',canvas.width/2,canvas.height/2+18,1,'12px Inter,sans-serif',t.muted,'center');
+  bgFill();const Th=TH();
+  const cx=canvas.width/2,cy=canvas.height/2;
+  txt(cx,cy-16,'⚡ Enter values and click Solve & Animate',Th.text,'700 18px Space Grotesk,sans-serif',1,'center');
+  txt(cx,cy+14,'Numbers or symbols — h, m, g, $, α, anything goes',Th.muted,'13px Space Grotesk,sans-serif',1,'center');
+  txt(cx,cy+42,'β = bar angle from horizontal  ·  α = force angle from bar',Th.faint,'11px Space Mono,monospace',.8,'center');
 }
 
-function textFade(text,x,y,t,font,color,align='left'){if(t<=0)return;ctx.save();ctx.globalAlpha=clamp(t,0,1);ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.restore();}
-function lineProg(x1,y1,x2,y2,t){const p=ease(clamp(t,0,1));const x=x1+(x2-x1)*p,y=y1+(y2-y1)*p;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x,y);ctx.stroke();return [x,y]}
-function arrowProg(x1,y1,x2,y2,color,t,label='',dx=8,dy=-8){ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.lineCap='round';const [px,py]=lineProg(x1,y1,x2,y2,t);if(t>.82){const k=(t-.82)/.18;const a=Math.atan2(y2-y1,x2-x1),s=11*k;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-s*Math.cos(a-Math.PI/6),py-s*Math.sin(a-Math.PI/6));ctx.lineTo(px-s*Math.cos(a+Math.PI/6),py-s*Math.sin(a+Math.PI/6));ctx.closePath();ctx.fill();}if(label&&t>.9){ctx.globalAlpha=(t-.9)/.1;ctx.font='700 15px Inter,sans-serif';ctx.fillText(label,x2+dx,y2+dy)}ctx.restore();}
-function pointPop(x,y,label,color,t){if(t<=0)return;ctx.save();const r=5*ease(clamp(t,0,1));ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();if(t>.82){ctx.font='700 13px Inter,sans-serif';ctx.fillStyle=color;ctx.fillText(label,x+8,y-8)}ctx.restore();}
-function dimLine(x1,y,x2,label,color,offset=0,t=1){ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.4;ctx.setLineDash([6,5]);lineProg(x1,y+offset,x2,y+offset,t);ctx.setLineDash([]);if(t>.9){ctx.font='11px Inter,sans-serif';ctx.textAlign='center';ctx.fillText(label,(x1+x2)/2,y+offset-8)}ctx.restore();}
+/* ══ EVENTS ══ */
+document.getElementById('solveBtn').addEventListener('click',()=>{
+  if(!validate())return;
+  const p=compute();
+  if(!p){document.getElementById('errMsg').textContent='Fill all fields.';document.getElementById('errMsg').style.display='block';return}
+  window._P=p;showResults(p);animateTab(p,window._tab||'fbd',false);
+});
 
-function collectParams(){
-  clearErrors();
-  
-  if(!validateInputs()) return null;
-  
-  const H=parseFloat(document.getElementById('inp_h').value);
-  const D=parseFloat(document.getElementById('inp_d').value);
-  const CG=parseFloat(document.getElementById('inp_cg').value);
-  const alpha=parseFloat(document.getElementById('inp_alpha').value);
-  const beta=parseFloat(document.getElementById('inp_beta').value);
-  const mass=parseFloat(document.getElementById('inp_mass').value);
-  const g=parseFloat(document.getElementById('inp_g').value);
-  
-  const forceLabel=safeText(document.getElementById('lbl_force').value,'F');
-  const weightLabel=safeText(document.getElementById('lbl_weight').value,'mg');
-  const reactionLabel=safeText(document.getElementById('lbl_reaction').value,'R_B');
-  const outputLabel=safeText(document.getElementById('lbl_output').value,'F');
-  
-  const Hm=H/1000, AG=D/1000, GB=CG/1000, AB=AG+GB;
-  const alphaR=deg(alpha), betaR=deg(beta);
-  const thetaF=Math.PI-betaR-alphaR;
-  const ux=Math.cos(thetaF), uy=Math.sin(thetaF);
-  const W=mass*g;
-  const dF=Math.abs((-AB)*uy-(Hm)*ux);
-  const dW=GB;
-  const MW=W*dW;
-  const F=dF > 0 ? MW/dF : Infinity;
-  
-  return {
-    H,D,CG,alpha,beta,mass,g,Hm,AG,GB,AB,alphaR,betaR,thetaF,ux,uy,W,dF,dW,MW,F,
-    forceLabel,weightLabel,reactionLabel,outputLabel,
-    isZeroMass: mass === 0,
-    isZeroGB: GB === 0,
-    isZeroDF: dF === 0,
-    isInfiniteF: !Number.isFinite(F)
-  };
-}
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
+    window._tab=btn.dataset.tab;
+    if(window._P)animateTab(window._P,window._tab,true);else drawPlaceholder();
+  });
+});
 
-function renderSpecialCase(p){
-  document.getElementById('resultCard').style.display='block';
-  
-  if(p.isZeroMass){
-    document.getElementById('res_W').textContent='0';
-    document.getElementById('res_dF').textContent=fmt(p.dF);
-    document.getElementById('res_dW').textContent=fmt(p.dW);
-    document.getElementById('res_Mw').textContent='0';
-    document.getElementById('res_F').textContent='0';
-    document.getElementById('res_symbol').textContent='F = 0 N (no load)';
-    
-    document.getElementById('stepsWrap').innerHTML=`
-      <div class="steps">
-        <div class="step active"><div class="n">1</div><div><div class="st">Zero mass case</div><div class="sd">Mass m = 0 kg means no weight force exists.</div><div class="math">W = 0 × g = 0 N</div></div></div>
-        <div class="step active"><div class="n">2</div><div><div class="st">Zero moment</div><div class="sd">No weight means no moment about B.</div><div class="math">${p.outputLabel} × d_F = 0 × d_W = 0</div></div></div>
-        <div class="step active"><div class="n">3</div><div><div class="st">Equilibrium</div><div class="sd">Zero moment requires zero force.</div><div class="math">${p.outputLabel} = 0 N</div></div></div>
-      </div>`;
-  }
-  else if(p.isZeroGB){
-    document.getElementById('res_W').textContent=fmt(p.W);
-    document.getElementById('res_dF').textContent=fmt(p.dF);
-    document.getElementById('res_dW').textContent='0';
-    document.getElementById('res_Mw').textContent='0';
-    document.getElementById('res_F').textContent='0';
-    document.getElementById('res_symbol').textContent='F = 0 N (G at B)';
-    
-    document.getElementById('stepsWrap').innerHTML=`
-      <div class="steps">
-        <div class="step active"><div class="n">1</div><div><div class="st">Zero moment arm</div><div class="sd">G→B = 0m means weight acts at pivot B.</div><div class="math">d_W = 0 m</div></div></div>
-        <div class="step active"><div class="n">2</div><div><div class="st">No moment from weight</div><div class="sd">Weight at pivot creates no moment.</div><div class="math">MW = W × 0 = 0 N·m</div></div></div>
-        <div class="step active"><div class="n">3</div><div><div class="st">Zero force needed</div><div class="sd">Equilibrium requires zero balancing moment.</div><div class="math">${p.outputLabel} = 0 / d_F = 0 N</div></div></div>
-      </div>`;
-  }
-  else if(p.isInfiniteF){
-    document.getElementById('res_W').textContent=fmt(p.W);
-    document.getElementById('res_dF').textContent='0';
-    document.getElementById('res_dW').textContent=fmt(p.dW);
-    document.getElementById('res_Mw').textContent=fmt(p.MW);
-    document.getElementById('res_F').textContent='∞';
-    document.getElementById('res_symbol').textContent='F = ∞ N (impossible)';
-    
-    document.getElementById('stepsWrap').innerHTML=`
-      <div class="steps">
-        <div class="step active"><div class="n">1</div><div><div class="st">Zero moment arm</div><div class="sd">Force line passes through pivot B (d_F = 0).</div><div class="math">d_F = 0 m</div></div></div>
-        <div class="step active"><div class="n">2</div><div><div class="st">Impossible equilibrium</div><div class="sd">Non-zero weight moment cannot be balanced.</div><div class="math">${p.outputLabel} × 0 = ${fmt(p.W)} × ${fmt(p.dW)}</div></div></div>
-        <div class="step active"><div class="n">3</div><div><div class="st">No solution</div><div class="sd">Infinite force required (physically impossible).</div><div class="math">${p.outputLabel} = ${fmt(p.MW)} / 0 = ∞</div></div></div>
-      </div>`;
-  }
-}
+document.querySelectorAll('.iw input').forEach(inp=>{
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('solveBtn').click()});
+});
 
-function renderResults(p){
-  document.getElementById('resultCard').style.display='block';
-  
-  if(p.isZeroMass || p.isZeroGB || p.isInfiniteF){
-    renderSpecialCase(p);
-    document.getElementById('eqBox').innerHTML=`ΣM_B = 0<br>Special case detected`;
-    return;
-  }
-  
-  document.getElementById('res_W').textContent=fmt(p.W,1);
-  document.getElementById('res_dF').textContent=fmt(p.dF,4);
-  document.getElementById('res_dW').textContent=fmt(p.dW,3);
-  document.getElementById('res_Mw').textContent=fmt(p.MW,1);
-  document.getElementById('res_F').textContent=fmt(p.F,1);
-  document.getElementById('res_symbol').textContent=`${p.outputLabel} (${fmt(p.F,1)} N)`;
-  
-  document.getElementById('eqBox').innerHTML=`ΣM_B = 0<br>${p.outputLabel} · ${fmt(p.dF,4)} = ${fmt(p.W,1)} · ${fmt(p.dW,3)}<br>${p.outputLabel} = ${fmt(p.F,1)} N`;
-  
-  document.getElementById('stepsWrap').innerHTML=`
-    <div class="steps">
-      <div class="step active"><div class="n">1</div><div><div class="st">Weight force</div><div class="sd">Total downward load from mass × gravity.</div><div class="math">W = ${fmt(p.mass)} × ${fmt(p.g)} = ${fmt(p.W,1)} N</div></div></div>
-      <div class="step active"><div class="n">2</div><div><div class="st">Weight moment arm</div><div class="sd">Horizontal distance G→B from pivot.</div><div class="math">d_W = ${fmt(p.dW,3)} m</div></div></div>
-      <div class="step active"><div class="n">3</div><div><div class="st">Force moment arm</div><div class="sd">Perpendicular distance from B to force line.</div><div class="math">d_F = ${fmt(p.dF,4)} m</div></div></div>
-      <div class="step active"><div class="n">4</div><div><div class="st">Moment balance</div><div class="sd">Clockwise = Counterclockwise moments.</div><div class="math">${p.outputLabel} × d_F = W × d_W</div></div></div>
-      <div class="step active"><div class="n">5</div><div><div class="st">Solve ${p.outputLabel}</div><div class="sd">Rearrange equilibrium equation.</div><div class="math">${p.outputLabel} = (${fmt(p.W,1)} × ${fmt(p.dW,3)}) / ${fmt(p.dF,4)} = ${fmt(p.F,1)} N</div></div></div>
-    </div>`;
-}
-
-function solveNow(){
-  const p=collectParams();
-  if(!p) return;
-  
-  window.lastParams=p;
-  renderResults(p);
-  animateRedraw(p,window.activeTab||'fbd',false);
-}
-
-document.getElementById('solveBtn').addEventListener('click',solveNow);
-document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
-  const tab=btn.dataset.tab;
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
-  window.activeTab=tab;
-  if(window.lastParams) animateRedraw(window.lastParams,tab,true); else drawPlaceholder();
-}));
-
-// Copy existing drawing functions (drawFullFBD, drawGeometry, drawMoments, animateRedraw, etc.)
-// [All existing canvas drawing functions remain exactly the same as original code]
-
+styleInputs();
 drawPlaceholder();
 </script>
 </body>
